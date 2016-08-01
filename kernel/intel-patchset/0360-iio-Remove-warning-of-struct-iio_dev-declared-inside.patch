@@ -1,0 +1,32 @@
+From 4ef91413bda212dcb46fef5a9b4fdf566afc56be Mon Sep 17 00:00:00 2001
+From: "Tan, Raymond" <raymond.tan@intel.com>
+Date: Tue, 4 Aug 2015 21:24:44 +0800
+Subject: [PATCH 360/389] iio: Remove warning of struct iio_dev declared inside
+ parameter list
+
+This patch is to include the iio.h header explicitly to avoid the warning
+of iio_dev struct declared inside parameter list.
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+Change-Id: Iec513cf9138f751ae8c6d50b8ebd14f9fc7b591c
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5996
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ include/linux/iio/common/st_sensors.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/linux/iio/common/st_sensors.h b/include/linux/iio/common/st_sensors.h
+index 883a390..4acee59 100644
+--- a/include/linux/iio/common/st_sensors.h
++++ b/include/linux/iio/common/st_sensors.h
+@@ -14,6 +14,7 @@
+ #include <linux/i2c.h>
+ #include <linux/spi/spi.h>
+ #include <linux/irqreturn.h>
++#include <linux/iio/iio.h>
+ #include <linux/iio/trigger.h>
+ #include <linux/bitops.h>
+ #include <linux/regulator/consumer.h>
+-- 
+1.9.3
+

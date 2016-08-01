@@ -1,0 +1,79 @@
+From 916102aa4145746bf55402609db1aece502cccf2 Mon Sep 17 00:00:00 2001
+From: Ben Gardner <gardner.ben@gmail.com>
+Date: Thu, 8 Oct 2015 02:55:20 +0000
+Subject: [PATCH 368/389] hwmon: (lm75) Add support for TMP75C
+
+The TMP75C has a different control register layout and only supports
+12-bit temperature samples (0.0625 deg C).
+The continuous sample rate is ~12 Hz.
+
+Signed-off-by: Ben Gardner <gardner.ben@gmail.com>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+(cherry picked from linux-next kernel commit 9c32e815cf9e29d5cfed738ad1cb3d07ea1bb67c)
+
+Conflicts:
+    Documentation/hwmon/lm75
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+Change-Id: Ia38a77f6b9098722dcdae0a3bb5bd47a62993c50
+---
+ Documentation/hwmon/lm75 | 4 ++--
+ drivers/hwmon/lm75.c     | 7 +++++++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 Documentation/hwmon/lm75
+ mode change 100644 => 100755 drivers/hwmon/lm75.c
+
+diff --git a/Documentation/hwmon/lm75 b/Documentation/hwmon/lm75
+old mode 100644
+new mode 100755
+index 2560a9c..b836e76
+--- a/Documentation/hwmon/lm75
++++ b/Documentation/hwmon/lm75
+@@ -42,8 +42,8 @@ Supported chips:
+     Addresses scanned: none
+     Datasheet: Publicly available at the ST website
+                http://www.st.com/internet/analog/product/121769.jsp
+-  * Texas Instruments TMP100, TMP101, TMP105, TMP75, TMP175, TMP275
+-    Prefixes: 'tmp100', 'tmp101', 'tmp105', 'tmp175', 'tmp75', 'tmp275'
++  * Texas Instruments TMP100, TMP101, TMP105, TMP75, TMP75C, TMP175, TMP275
++    Prefixes: 'tmp100', 'tmp101', 'tmp105', 'tmp175', 'tmp75', 'tmp75c', 'tmp275'
+     Addresses scanned: none
+     Datasheet: Publicly available at the Texas Instruments website
+                http://www.ti.com/product/tmp100
+diff --git a/drivers/hwmon/lm75.c b/drivers/hwmon/lm75.c
+old mode 100644
+new mode 100755
+index 84a55ea..48bbd21
+--- a/drivers/hwmon/lm75.c
++++ b/drivers/hwmon/lm75.c
+@@ -55,6 +55,7 @@ enum lm75_type {		/* keep sorted in alphabetical order */
+ 	tmp175,
+ 	tmp275,
+ 	tmp75,
++	tmp75c,
+ };
+ 
+ /* Addresses scanned */
+@@ -264,6 +265,11 @@ lm75_probe(struct i2c_client *client, const struct i2c_device_id *id)
+ 		data->resolution = 12;
+ 		data->sample_time = HZ / 2;
+ 		break;
++	case tmp75c:
++		clr_mask |= 1 << 5;		/* not one-shot mode */
++		data->resolution = 12;
++		data->sample_time = HZ / 4;
++		break;
+ 	}
+ 
+ 	/* configure as specified */
+@@ -337,6 +343,7 @@ static const struct i2c_device_id lm75_ids[] = {
+ 	{ "tmp175", tmp175, },
+ 	{ "tmp275", tmp275, },
+ 	{ "tmp75", tmp75, },
++	{ "tmp75c", tmp75c, },
+ 	{ /* LIST END */ }
+ };
+ MODULE_DEVICE_TABLE(i2c, lm75_ids);
+-- 
+1.9.3
+

@@ -1,0 +1,28 @@
+From ade125e247176ef554cb55cb9d0c7c3be53926e3 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Fri, 11 Dec 2015 11:18:28 +0000
+Subject: [PATCH 385/389] af_can: remove incompatible arg type in rtnl_doit
+
+remove J1939 backports incompatible arg type in can_rtnl_doit()
+
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+---
+ net/can/af_can.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/can/af_can.c b/net/can/af_can.c
+index eced571..8093bc7 100644
+--- a/net/can/af_can.c
++++ b/net/can/af_can.c
+@@ -872,7 +872,7 @@ static struct notifier_block can_netdev_notifier __read_mostly = {
+ /*
+  * RTNETLINK
+  */
+-static int can_rtnl_doit(struct sk_buff *skb, struct nlmsghdr *nlh, void *arg)
++static int can_rtnl_doit(struct sk_buff *skb, struct nlmsghdr *nlh)
+ {
+ 	int ret, protocol;
+ 	const struct can_proto *cp;
+-- 
+1.9.3
+

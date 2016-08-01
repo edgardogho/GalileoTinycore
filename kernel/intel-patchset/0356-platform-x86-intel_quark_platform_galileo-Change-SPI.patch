@@ -1,0 +1,34 @@
+From 907b6d0609bb354019a1bc934d3edd7235e04d91 Mon Sep 17 00:00:00 2001
+From: "Wong, Mun Choy" <mun.choy.wong@intel.com>
+Date: Fri, 31 Jul 2015 18:25:31 +0800
+Subject: [PATCH 356/389] platform: x86: intel_quark_platform_galileo: Change
+ SPI, I2C & GPIO calling sequence (RTC:114524)
+
+This is to rework the commit 541fd58adb2df103ccb6a011f9a3e861714e585d
+(Patch Set 2) after the code review.
+
+Signed-off-by: Wong, Mun Choy <mun.choy.wong@intel.com>
+Change-Id: I97a48d5205418799800232761a522c5f228efad5
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5953
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+index 436f2ae..3f4146a 100644
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+@@ -304,8 +304,7 @@ static int intel_qrk_gpio_restrict_probe(struct platform_device *pdev)
+ 	if (NULL == i2c_adap) {
+ 		pr_info("%s: i2c adapter not ready yet. Deferring..\n",
+ 			__func__);
+-		ret = -EPROBE_DEFER;
+-		goto end;
++		return -EPROBE_DEFER;
+ 	}
+ 
+ 	ret = gpio_request_array(reserved_gpios, ARRAY_SIZE(reserved_gpios));
+-- 
+1.9.3
+

@@ -1,0 +1,27 @@
+From 9accce3c386f394dbda4517c2469d6050b653fe5 Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Thu, 5 Nov 2015 15:27:24 +0000
+Subject: [PATCH 367/389] Platform: Enable support for Reliance Creek CRBs
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/platform/x86/intel-quark/Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/platform/x86/intel-quark/Makefile b/drivers/platform/x86/intel-quark/Makefile
+index e608c44..fa20ce1 100644
+--- a/drivers/platform/x86/intel-quark/Makefile
++++ b/drivers/platform/x86/intel-quark/Makefile
+@@ -6,8 +6,7 @@ obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_quark_platform_cross_hill.o
+ obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_quark_platform_clanton_peak.o
+ obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_quark_platform_clanton_hill.o
+ obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_quark_platform_kips_bay.o
+-# To add Reliance Creek platform support, kindly enable below line.
+-# obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_qrk_plat_reliance_creek.o
++obj-$(CONFIG_X86_INTEL_QUARK)			+= intel_qrk_plat_reliance_creek.o
+ obj-$(CONFIG_INTEL_QRK_J1708) += intel_qrk_j1708.o
+ obj-$(CONFIG_INTEL_QRK_AUDIO_CTRL)+= intel_qrk_audio_ctrl.o
+ obj-$(CONFIG_INTEL_QRK_THERMAL)+= intel_qrk_thermal.o
+-- 
+1.9.3
+

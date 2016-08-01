@@ -1,0 +1,29 @@
+From c97651f479d18a087ac513b5ef398d79d47dcd64 Mon Sep 17 00:00:00 2001
+From: "Tan, Raymond" <raymond.tan@intel.com>
+Date: Mon, 6 Apr 2015 14:08:30 +0800
+Subject: [PATCH 231/389] arch: x86: Add new kernel config for X86_INTEL_QUARK
+
+This patch is to add the kernel config CONFIG_ARCH_REQUIRE_GPIOLIB
+in the arch kernel config for Intel Quark X1000. This will
+enables gpiolib code always get built in.
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ arch/x86/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index fcf9ad0..37f06dd 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -475,6 +475,7 @@ config X86_INTEL_QUARK
+ 	select IOSF_MBI
+ 	select INTEL_IMR
+ 	select COMMON_CLK
++	select ARCH_REQUIRE_GPIOLIB
+ 	---help---
+ 	  Select to include support for Quark X1000 SoC.
+ 	  Say Y here if you have a Quark based system such as the Arduino
+-- 
+1.9.3
+

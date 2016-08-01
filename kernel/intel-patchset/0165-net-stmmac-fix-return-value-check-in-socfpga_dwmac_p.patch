@@ -1,0 +1,38 @@
+From 0f0ada7f65950e03f731467d492ccd23db7fbdb5 Mon Sep 17 00:00:00 2001
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Date: Fri, 12 Sep 2014 07:12:57 +0800
+Subject: [PATCH 165/389] net: stmmac: fix return value check in
+ socfpga_dwmac_parse_data()
+
+In case of error, the function devm_ioremap_resource() returns
+ERR_PTR() and never returns NULL. The NULL test in the return
+value check should be replaced with IS_ERR().
+
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit f19f916d64e7a0af743bbfc7d1594db08c712f9f)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index ddc6115..3aad413 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -120,9 +120,9 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 		}
+ 
+ 		dwmac->splitter_base = devm_ioremap_resource(dev, &res_splitter);
+-		if (!dwmac->splitter_base) {
++		if (IS_ERR(dwmac->splitter_base)) {
+ 			dev_info(dev, "Failed to mapping emac splitter\n");
+-			return -EINVAL;
++			return PTR_ERR(dwmac->splitter_base);
+ 		}
+ 	}
+ 
+-- 
+1.9.3
+

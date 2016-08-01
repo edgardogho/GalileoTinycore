@@ -1,0 +1,31 @@
+From 9823f816a90d2025ee89780bfd813e49e0c65a75 Mon Sep 17 00:00:00 2001
+From: Wolfram Sang <wsa@the-dreams.de>
+Date: Mon, 20 Oct 2014 16:21:56 +0200
+Subject: [PATCH 007/389] watchdog: drop owner assignment from platform_drivers
+
+A platform_driver does not need to set an owner, it will be populated by the
+driver core.
+
+Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+(cherry picked from commit fa21a580dea456c03fcf69203dcd0195df3f7dee)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/watchdog/ie6xx_wdt.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/watchdog/ie6xx_wdt.c b/drivers/watchdog/ie6xx_wdt.c
+index 07f88f5..9bc39ae 100644
+--- a/drivers/watchdog/ie6xx_wdt.c
++++ b/drivers/watchdog/ie6xx_wdt.c
+@@ -313,7 +313,6 @@ static struct platform_driver ie6xx_wdt_driver = {
+ 	.remove		= ie6xx_wdt_remove,
+ 	.driver		= {
+ 		.name	= DRIVER_NAME,
+-		.owner	= THIS_MODULE,
+ 	},
+ };
+ 
+-- 
+1.9.3
+

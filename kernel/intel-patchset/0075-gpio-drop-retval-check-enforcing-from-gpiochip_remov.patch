@@ -1,0 +1,37 @@
+From b29042cdccd3e7dfd31c608a6699bdc9ae7eef7c Mon Sep 17 00:00:00 2001
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 23 Jul 2014 10:47:49 +0200
+Subject: [PATCH 075/389] gpio: drop retval check enforcing from
+ gpiochip_remove()
+
+As we start to decomission the return value from gpiochip_remove()
+the compilers emit warnings due to the function being tagged
+__must_check. So drop this until we remove the return value
+altogether.
+
+Cc: Abdoulaye Berthe <berthe.ab@gmail.com>
+Suggested-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+(cherry picked from commit 14c8a620ba436511b1347c592633befa49535176)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ include/linux/gpio/driver.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/gpio/driver.h b/include/linux/gpio/driver.h
+index 8569b43..f8f6fae 100644
+--- a/include/linux/gpio/driver.h
++++ b/include/linux/gpio/driver.h
+@@ -141,7 +141,7 @@ extern const char *gpiochip_is_requested(struct gpio_chip *chip,
+ 
+ /* add/remove chips */
+ extern int gpiochip_add(struct gpio_chip *chip);
+-extern int __must_check gpiochip_remove(struct gpio_chip *chip);
++extern int gpiochip_remove(struct gpio_chip *chip);
+ extern struct gpio_chip *gpiochip_find(void *data,
+ 			      int (*match)(struct gpio_chip *chip, void *data));
+ 
+-- 
+1.9.3
+

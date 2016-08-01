@@ -1,0 +1,175 @@
+From 6cf1def727049cc92646a3c2f1e501be9d505426 Mon Sep 17 00:00:00 2001
+From: Dinh Nguyen <dinguyen@altera.com>
+Date: Wed, 26 Mar 2014 22:45:11 -0500
+Subject: [PATCH 127/389] dts: socfpga: Add DTS entry for adding the stmmac
+ glue layer for stmmac.
+
+This patch adds the dts bindings documenation for the Altera SOCFPGA glue
+layer for the Synopsys STMMAC ethernet driver.
+
+Signed-off-by: Dinh Nguyen <dinguyen@altera.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+(cherry picked from commit 2755e18748bd2f63ee17b7aef173699531f6353d)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ .../devicetree/bindings/net/socfpga-dwmac.txt      | 27 ++++++++++++++++++++++
+ arch/arm/boot/dts/socfpga.dtsi                     |  2 ++
+ arch/arm/boot/dts/socfpga_arria5_socdk.dts         | 21 +++++++++++++++++
+ arch/arm/boot/dts/socfpga_cyclone5_socdk.dts       | 14 +++++++++++
+ arch/arm/boot/dts/socfpga_cyclone5_sockit.dts      | 17 ++++++++++++++
+ arch/arm/boot/dts/socfpga_vt.dts                   |  5 ++++
+ 6 files changed, 86 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+
+diff --git a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+new file mode 100644
+index 0000000..636f0ac
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+@@ -0,0 +1,27 @@
++Altera SOCFPGA SoC DWMAC controller
++
++This is a variant of the dwmac/stmmac driver an inherits all descriptions
++present in Documentation/devicetree/bindings/net/stmmac.txt.
++
++The device node has additional properties:
++
++Required properties:
++ - compatible	: Should contain "altr,socfpga-stmmac" along with
++		  "snps,dwmac" and any applicable more detailed
++		  designware version numbers documented in stmmac.txt
++ - altr,sysmgr-syscon : Should be the phandle to the system manager node that
++   encompasses the glue register, the register offset, and the register shift.
++
++Example:
++
++gmac0: ethernet@ff700000 {
++	compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
++	altr,sysmgr-syscon = <&sysmgr 0x60 0>;
++	status = "disabled";
++	reg = <0xff700000 0x2000>;
++	interrupts = <0 115 4>;
++	interrupt-names = "macirq";
++	mac-address = [00 00 00 00 00 00];/* Filled in by U-Boot */
++	clocks = <&emac_0_clk>;
++	clocks-names = "stmmaceth";
++};
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 537f1a5..ba51d69 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -443,6 +443,7 @@
+ 
+ 		gmac0: ethernet@ff700000 {
+ 			compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
++			altr,sysmgr-syscon = <&sysmgr 0x60 0>;
+ 			reg = <0xff700000 0x2000>;
+ 			interrupts = <0 115 4>;
+ 			interrupt-names = "macirq";
+@@ -454,6 +455,7 @@
+ 
+ 		gmac1: ethernet@ff702000 {
+ 			compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
++			altr,sysmgr-syscon = <&sysmgr 0x60 2>;
+ 			reg = <0xff702000 0x2000>;
+ 			interrupts = <0 120 4>;
+ 			interrupt-names = "macirq";
+diff --git a/arch/arm/boot/dts/socfpga_arria5_socdk.dts b/arch/arm/boot/dts/socfpga_arria5_socdk.dts
+index 5beffb2..a87ee1c 100644
+--- a/arch/arm/boot/dts/socfpga_arria5_socdk.dts
++++ b/arch/arm/boot/dts/socfpga_arria5_socdk.dts
+@@ -37,4 +37,25 @@
+ 		*/
+ 		ethernet0 = &gmac1;
+ 	};
++
++	aliases {
++		/* this allow the ethaddr uboot environmnet variable contents
++		 * to be added to the gmac1 device tree blob.
++		 */
++		ethernet0 = &gmac1;
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	rxd0-skew-ps = <0>;
++	rxd1-skew-ps = <0>;
++	rxd2-skew-ps = <0>;
++	rxd3-skew-ps = <0>;
++	txen-skew-ps = <0>;
++	txc-skew-ps = <2600>;
++	rxdv-skew-ps = <0>;
++	rxc-skew-ps = <2000>;
+ };
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_socdk.dts b/arch/arm/boot/dts/socfpga_cyclone5_socdk.dts
+index 2ee52ab..ae16d97 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_socdk.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_socdk.dts
+@@ -38,3 +38,17 @@
+ 		ethernet0 = &gmac1;
+ 	};
+ };
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	rxd0-skew-ps = <0>;
++	rxd1-skew-ps = <0>;
++	rxd2-skew-ps = <0>;
++	rxd3-skew-ps = <0>;
++	txen-skew-ps = <0>;
++	txc-skew-ps = <2600>;
++	rxdv-skew-ps = <0>;
++	rxc-skew-ps = <2000>;
++};
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_sockit.dts b/arch/arm/boot/dts/socfpga_cyclone5_sockit.dts
+index 50b99a2..b79e2a2 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_sockit.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_sockit.dts
+@@ -30,8 +30,25 @@
+ 		device_type = "memory";
+ 		reg = <0x0 0x40000000>; /* 1GB */
+ 	};
++
++	aliases {
++		/* this allow the ethaddr uboot environmnet variable contents
++		 * to be added to the gmac1 device tree blob.
++		 */
++		ethernet0 = &gmac1;
++	};
+ };
+ 
+ &gmac1 {
+ 	status = "okay";
++	phy-mode = "rgmii";
++
++	rxd0-skew-ps = <0>;
++	rxd1-skew-ps = <0>;
++	rxd2-skew-ps = <0>;
++	rxd3-skew-ps = <0>;
++	txen-skew-ps = <0>;
++	txc-skew-ps = <2600>;
++	rxdv-skew-ps = <0>;
++	rxc-skew-ps = <2000>;
+ };
+diff --git a/arch/arm/boot/dts/socfpga_vt.dts b/arch/arm/boot/dts/socfpga_vt.dts
+index d1ec0ca..dde2c66 100644
+--- a/arch/arm/boot/dts/socfpga_vt.dts
++++ b/arch/arm/boot/dts/socfpga_vt.dts
+@@ -75,3 +75,8 @@
+ 		};
+ 	};
+ };
++
++&gmac0 {
++	status = "okay";
++	phy-mode = "gmii";
++};
+-- 
+1.9.3
+

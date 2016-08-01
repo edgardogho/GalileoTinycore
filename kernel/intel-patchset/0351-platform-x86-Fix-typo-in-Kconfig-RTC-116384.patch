@@ -1,0 +1,42 @@
+From be55b3e60a124958afa773823c75d6ba8d9b588f Mon Sep 17 00:00:00 2001
+From: YUGERAJ RAMAJAYAM <yugeraj.ramajayam@intel.com>
+Date: Tue, 28 Jul 2015 16:31:38 +0800
+Subject: [PATCH 351/389] platform: x86: Fix typo in Kconfig (RTC:116384)
+
+This patch fix missed quote symbol in Kconfig.
+
+This error was found in drivers/platform/x86/Kconfig
+Line number:758
+
+Initial:
+source "drivers/platform/x86/intel-quark/Kconfig
+
+Fixed:
+source "drivers/platform/x86/intel-quark/Kconfig"
+
+Suggested-by: Pengyu Ma <pengyu.ma@windriver.com>
+Signed-off-by: YUGERAJ RAMAJAYAM <yugeraj.ramajayam@intel.com>
+Change-Id: Idba645eb5f60bf86d7c79a7ba79fbcffe5b730c8
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5905
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+Tested-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ drivers/platform/x86/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/platform/x86/Kconfig b/drivers/platform/x86/Kconfig
+index 1c26a0a..ea7e423 100644
+--- a/drivers/platform/x86/Kconfig
++++ b/drivers/platform/x86/Kconfig
+@@ -755,7 +755,7 @@ config INTEL_QRK_ESRAM
+ 	  than cache RAM faster than DRAM.
+ 
+ if X86_INTEL_QUARK
+-source "drivers/platform/x86/intel-quark/Kconfig
++source "drivers/platform/x86/intel-quark/Kconfig"
+ endif
+ 
+ config IBM_RTL
+-- 
+1.9.3
+

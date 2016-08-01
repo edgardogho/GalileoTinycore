@@ -1,0 +1,39 @@
+From 87547d9f8a5f13e4cb01bb379bdf74f8cc997959 Mon Sep 17 00:00:00 2001
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 7 Mar 2014 10:12:49 +0800
+Subject: [PATCH 033/389] gpio: remove misleading documentation
+
+It is currently debated where the functions to lock a certain
+GPIO line as used for IRQs should be called. Delete all
+misleading documentation.
+
+Reported-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Jean-Jacques Hiblot <jjhiblot@traphandler.com>
+Acked-by: Alexandre Courbot <acourbot@nvidia.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+(cherry picked from commit f438acdf3de8f19ad2789eddbf52e3280292759b)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ drivers/gpio/gpiolib.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index 9cd7082..aa6a11b 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -2167,10 +2167,7 @@ EXPORT_SYMBOL_GPL(gpiod_to_irq);
+  * @gpio: the GPIO line to lock as used for IRQ
+  *
+  * This is used directly by GPIO drivers that want to lock down
+- * a certain GPIO line to be used as IRQs, for example in the
+- * .to_irq() callback of their gpio_chip, or in the .irq_enable()
+- * of its irq_chip implementation if the GPIO is known from that
+- * code.
++ * a certain GPIO line to be used for IRQs.
+  */
+ int gpiod_lock_as_irq(struct gpio_desc *desc)
+ {
+-- 
+1.9.3
+

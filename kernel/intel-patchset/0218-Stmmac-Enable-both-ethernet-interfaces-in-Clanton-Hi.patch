@@ -1,0 +1,45 @@
+From 30323cb0bd3a6ede8c9a1442e0458c6cfd7ad90a Mon Sep 17 00:00:00 2001
+From: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+Date: Mon, 16 Mar 2015 14:50:45 +0800
+Subject: [PATCH 218/389] Stmmac: Enable both ethernet interfaces in Clanton
+ Hill
+
+This change ported from 3.8 kerenl enables both ehternet intrfaces
+with debugfs support with commid ID 96822325b50f94959998e8353cd397cb059f7a53.
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 81026a5..4140fef 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -119,6 +119,7 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id);
+ #ifdef CONFIG_DEBUG_FS
+ static int stmmac_init_fs(struct net_device *dev);
+ static void stmmac_exit_fs(void);
++static int debugfs_registered = 0;
+ #endif
+ 
+ #define STMMAC_COAL_TIMER(x) (jiffies + usecs_to_jiffies(x))
+@@ -1728,9 +1729,12 @@ static int stmmac_hw_setup(struct net_device *dev, bool init_ptp)
+ 	}
+ 
+ #ifdef CONFIG_DEBUG_FS
+-	ret = stmmac_init_fs(dev);
+-	if (ret < 0)
+-		pr_warn("%s: failed debugFS registration\n", __func__);
++	if (debugfs_registered == 0) {
++		debugfs_registered = 1;
++		ret = stmmac_init_fs(dev);
++		if (ret < 0)
++			pr_warn("%s: failed debugFS registration\n", __func__);
++	}
+ #endif
+ 	/* Start the ball rolling... */
+ 	pr_debug("%s: DMA RX/TX processes started...\n", dev->name);
+-- 
+1.9.3
+

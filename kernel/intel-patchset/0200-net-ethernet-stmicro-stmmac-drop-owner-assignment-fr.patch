@@ -1,0 +1,33 @@
+From 0e66be8dc8c8c0d23b0c4930b13de522889d3462 Mon Sep 17 00:00:00 2001
+From: Wolfram Sang <wsa@the-dreams.de>
+Date: Sun, 21 Dec 2014 22:14:31 +0100
+Subject: [PATCH 200/389] net: ethernet: stmicro: stmmac: drop owner assignment
+ from platform_drivers
+
+This platform_driver does not need to set an owner, it will be populated by the
+driver core.
+
+Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit f620e4fe161f4d488414d7893a690e76b53f0c5e)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 4032b17..3039de2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -430,7 +430,6 @@ static struct platform_driver stmmac_pltfr_driver = {
+ 	.remove = stmmac_pltfr_remove,
+ 	.driver = {
+ 		   .name = STMMAC_RESOURCE_NAME,
+-		   .owner = THIS_MODULE,
+ 		   .pm = &stmmac_pltfr_pm_ops,
+ 		   .of_match_table = of_match_ptr(stmmac_dt_ids),
+ 	},
+-- 
+1.9.3
+

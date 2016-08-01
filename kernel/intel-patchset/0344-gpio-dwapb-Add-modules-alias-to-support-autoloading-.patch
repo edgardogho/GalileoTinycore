@@ -1,0 +1,32 @@
+From 593e47d5143ed2e434c73965033fccb57631253f Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Wed, 8 Jul 2015 07:14:47 +0100
+Subject: [PATCH 344/389] gpio-dwapb: Add modules alias to support autoloading
+ module RTC#114942 Change made by Pengyu Ma as part of Windriver kernel patch
+
+Galileo platform driver add mfd device of gpio-dwapb that requires
+gpio-dwapb driver, without alias module can not be autoloaded.
+Add module alias for gpio-dwapb to support autoloading module.
+
+Signed-off-by: Pengyu Ma <pengyu.ma@windriver.com>
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+Change-Id: I177212633f2fefeeabec3a65e94c2f062cff35bd
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5611
+Reviewed-by: Tan, Raymond <raymond.tan@intel.com>
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/gpio/gpio-dwapb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpio/gpio-dwapb.c b/drivers/gpio/gpio-dwapb.c
+index 7feaf9d..fa36317 100644
+--- a/drivers/gpio/gpio-dwapb.c
++++ b/drivers/gpio/gpio-dwapb.c
+@@ -716,3 +716,4 @@ module_platform_driver(dwapb_gpio_driver);
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Jamie Iles");
+ MODULE_DESCRIPTION("Synopsys DesignWare APB GPIO driver");
++MODULE_ALIAS("platform:gpio-dwapb");
+-- 
+1.9.3
+

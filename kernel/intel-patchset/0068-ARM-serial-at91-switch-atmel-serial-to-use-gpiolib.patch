@@ -1,0 +1,447 @@
+From c08bbd133f40f062e41ed56263e25272f3887eb5 Mon Sep 17 00:00:00 2001
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 7 Nov 2013 10:25:55 +0100
+Subject: [PATCH 068/389] ARM/serial: at91: switch atmel serial to use gpiolib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This passes the errata fix using a GPIO to control the RTS pin
+on one of the AT91 chips to use gpiolib instead of the
+AT91-specific interfaces. Also remove the reliance on
+compile-time #defines and the cpu_* check and rely on the
+platform passing down the proper GPIO pin through platform
+data.
+
+This is a prerequisite for getting rid of the local GPIO
+implementation in the AT91 platform and move toward
+multiplatform.
+
+The patch also adds device tree support for getting the
+RTS GPIO pin from the device tree on DT boot paths.
+
+Signed-off-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+Acked-by: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+(cherry picked from commit 354e57f3a0a26120af3bcd6c92c355ad00a057c1)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ .../devicetree/bindings/serial/atmel-usart.txt     |  3 ++
+ arch/arm/mach-at91/at91rm9200_devices.c            | 10 ++++-
+ arch/arm/mach-at91/at91sam9260_devices.c           |  7 ++++
+ arch/arm/mach-at91/at91sam9261_devices.c           |  4 ++
+ arch/arm/mach-at91/at91sam9263_devices.c           |  4 ++
+ arch/arm/mach-at91/at91sam9g45_devices.c           |  5 +++
+ arch/arm/mach-at91/at91sam9rl_devices.c            |  5 +++
+ drivers/tty/serial/atmel_serial.c                  | 49 ++++++++++++++--------
+ include/linux/platform_data/atmel.h                |  1 +
+ 9 files changed, 68 insertions(+), 20 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/serial/atmel-usart.txt b/Documentation/devicetree/bindings/serial/atmel-usart.txt
+index 9c5d19a..17c1042 100644
+--- a/Documentation/devicetree/bindings/serial/atmel-usart.txt
++++ b/Documentation/devicetree/bindings/serial/atmel-usart.txt
+@@ -13,6 +13,8 @@ Required properties:
+ Optional properties:
+ - atmel,use-dma-rx: use of PDC or DMA for receiving data
+ - atmel,use-dma-tx: use of PDC or DMA for transmitting data
++- rts-gpios: specify a GPIO for RTS line. It will use specified PIO instead of the peripheral
++  function pin for the USART RTS feature. If unsure, don't specify this property.
+ - add dma bindings for dma transfer:
+ 	- dmas: DMA specifier, consisting of a phandle to DMA controller node,
+ 		memory peripheral interface and USART DMA channel ID, FIFO configuration.
+@@ -33,6 +35,7 @@ Example:
+ 		clock-names = "usart";
+ 		atmel,use-dma-rx;
+ 		atmel,use-dma-tx;
++		rts-gpios = <&pioD 15 0>;
+ 	};
+ 
+ - use DMA:
+diff --git a/arch/arm/mach-at91/at91rm9200_devices.c b/arch/arm/mach-at91/at91rm9200_devices.c
+index 3ebc979..605add0 100644
+--- a/arch/arm/mach-at91/at91rm9200_devices.c
++++ b/arch/arm/mach-at91/at91rm9200_devices.c
+@@ -922,6 +922,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,		/* DBGU not capable of receive DMA */
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -960,6 +961,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -987,9 +989,10 @@ static inline void configure_usart0_pins(unsigned pins)
+ 	if (pins & ATMEL_UART_RTS) {
+ 		/*
+ 		 * AT91RM9200 Errata #39 - RTS0 is not internally connected to PA21.
+-		 *  We need to drive the pin manually.  Default is off (RTS is active low).
++		 * We need to drive the pin manually. The serial driver will driver
++		 * this to high when initializing.
+ 		 */
+-		at91_set_gpio_output(AT91_PIN_PA21, 1);
++		uart0_data.rts_gpio = AT91_PIN_PA21;
+ 	}
+ }
+ 
+@@ -1009,6 +1012,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -1060,6 +1064,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+@@ -1103,6 +1108,7 @@ static struct resource uart3_resources[] = {
+ static struct atmel_uart_data uart3_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart3_dmamask = DMA_BIT_MASK(32);
+diff --git a/arch/arm/mach-at91/at91sam9260_devices.c b/arch/arm/mach-at91/at91sam9260_devices.c
+index eda8d16..b52527c 100644
+--- a/arch/arm/mach-at91/at91sam9260_devices.c
++++ b/arch/arm/mach-at91/at91sam9260_devices.c
+@@ -819,6 +819,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,		/* DBGU not capable of receive DMA */
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -857,6 +858,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -908,6 +910,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -951,6 +954,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+@@ -994,6 +998,7 @@ static struct resource uart3_resources[] = {
+ static struct atmel_uart_data uart3_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart3_dmamask = DMA_BIT_MASK(32);
+@@ -1037,6 +1042,7 @@ static struct resource uart4_resources[] = {
+ static struct atmel_uart_data uart4_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart4_dmamask = DMA_BIT_MASK(32);
+@@ -1075,6 +1081,7 @@ static struct resource uart5_resources[] = {
+ static struct atmel_uart_data uart5_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart5_dmamask = DMA_BIT_MASK(32);
+diff --git a/arch/arm/mach-at91/at91sam9261_devices.c b/arch/arm/mach-at91/at91sam9261_devices.c
+index b2a3474..6c1a2ec 100644
+--- a/arch/arm/mach-at91/at91sam9261_devices.c
++++ b/arch/arm/mach-at91/at91sam9261_devices.c
+@@ -880,6 +880,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,		/* DBGU not capable of receive DMA */
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -918,6 +919,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -961,6 +963,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -1004,6 +1007,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+diff --git a/arch/arm/mach-at91/at91sam9263_devices.c b/arch/arm/mach-at91/at91sam9263_devices.c
+index 4aeaddd..97cc2a0 100644
+--- a/arch/arm/mach-at91/at91sam9263_devices.c
++++ b/arch/arm/mach-at91/at91sam9263_devices.c
+@@ -1324,6 +1324,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,		/* DBGU not capable of receive DMA */
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -1362,6 +1363,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -1405,6 +1407,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -1448,6 +1451,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+diff --git a/arch/arm/mach-at91/at91sam9g45_devices.c b/arch/arm/mach-at91/at91sam9g45_devices.c
+index cb36fa8..c101495 100644
+--- a/arch/arm/mach-at91/at91sam9g45_devices.c
++++ b/arch/arm/mach-at91/at91sam9g45_devices.c
+@@ -1587,6 +1587,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -1625,6 +1626,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -1668,6 +1670,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -1711,6 +1714,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+@@ -1754,6 +1758,7 @@ static struct resource uart3_resources[] = {
+ static struct atmel_uart_data uart3_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart3_dmamask = DMA_BIT_MASK(32);
+diff --git a/arch/arm/mach-at91/at91sam9rl_devices.c b/arch/arm/mach-at91/at91sam9rl_devices.c
+index a698bda..4120af9 100644
+--- a/arch/arm/mach-at91/at91sam9rl_devices.c
++++ b/arch/arm/mach-at91/at91sam9rl_devices.c
+@@ -956,6 +956,7 @@ static struct resource dbgu_resources[] = {
+ static struct atmel_uart_data dbgu_data = {
+ 	.use_dma_tx	= 0,
+ 	.use_dma_rx	= 0,		/* DBGU not capable of receive DMA */
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 dbgu_dmamask = DMA_BIT_MASK(32);
+@@ -994,6 +995,7 @@ static struct resource uart0_resources[] = {
+ static struct atmel_uart_data uart0_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart0_dmamask = DMA_BIT_MASK(32);
+@@ -1045,6 +1047,7 @@ static struct resource uart1_resources[] = {
+ static struct atmel_uart_data uart1_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart1_dmamask = DMA_BIT_MASK(32);
+@@ -1088,6 +1091,7 @@ static struct resource uart2_resources[] = {
+ static struct atmel_uart_data uart2_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart2_dmamask = DMA_BIT_MASK(32);
+@@ -1131,6 +1135,7 @@ static struct resource uart3_resources[] = {
+ static struct atmel_uart_data uart3_data = {
+ 	.use_dma_tx	= 1,
+ 	.use_dma_rx	= 1,
++	.rts_gpio	= -EINVAL,
+ };
+ 
+ static u64 uart3_dmamask = DMA_BIT_MASK(32);
+diff --git a/drivers/tty/serial/atmel_serial.c b/drivers/tty/serial/atmel_serial.c
+index ce352b8..0ca411e 100644
+--- a/drivers/tty/serial/atmel_serial.c
++++ b/drivers/tty/serial/atmel_serial.c
+@@ -35,21 +35,18 @@
+ #include <linux/platform_device.h>
+ #include <linux/of.h>
+ #include <linux/of_device.h>
++#include <linux/of_gpio.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/atmel_pdc.h>
+ #include <linux/atmel_serial.h>
+ #include <linux/uaccess.h>
+ #include <linux/platform_data/atmel.h>
+ #include <linux/timer.h>
++#include <linux/gpio.h>
+ 
+ #include <asm/io.h>
+ #include <asm/ioctls.h>
+ 
+-#ifdef CONFIG_ARM
+-#include <mach/cpu.h>
+-#include <asm/gpio.h>
+-#endif
+-
+ #define PDC_BUFFER_SIZE		512
+ /* Revisit: We should calculate this based on the actual port settings */
+ #define PDC_RX_TIMEOUT		(3 * 10)		/* 3 bytes */
+@@ -168,6 +165,7 @@ struct atmel_uart_port {
+ 	struct circ_buf		rx_ring;
+ 
+ 	struct serial_rs485	rs485;		/* rs485 settings */
++	int			rts_gpio;	/* optional RTS GPIO */
+ 	unsigned int		tx_done_mask;
+ 	bool			is_usart;	/* usart or uart */
+ 	struct timer_list	uart_timer;	/* uart timer */
+@@ -301,20 +299,16 @@ static void atmel_set_mctrl(struct uart_port *port, u_int mctrl)
+ 	unsigned int mode;
+ 	struct atmel_uart_port *atmel_port = to_atmel_uart_port(port);
+ 
+-#ifdef CONFIG_ARCH_AT91RM9200
+-	if (cpu_is_at91rm9200()) {
+-		/*
+-		 * AT91RM9200 Errata #39: RTS0 is not internally connected
+-		 * to PA21. We need to drive the pin manually.
+-		 */
+-		if (port->mapbase == AT91RM9200_BASE_US0) {
+-			if (mctrl & TIOCM_RTS)
+-				at91_set_gpio_value(AT91_PIN_PA21, 0);
+-			else
+-				at91_set_gpio_value(AT91_PIN_PA21, 1);
+-		}
++	/*
++	 * AT91RM9200 Errata #39: RTS0 is not internally connected
++	 * to PA21. We need to drive the pin as a GPIO.
++	 */
++	if (gpio_is_valid(atmel_port->rts_gpio)) {
++		if (mctrl & TIOCM_RTS)
++			gpio_set_value(atmel_port->rts_gpio, 0);
++		else
++			gpio_set_value(atmel_port->rts_gpio, 1);
+ 	}
+-#endif
+ 
+ 	if (mctrl & TIOCM_RTS)
+ 		control |= ATMEL_US_RTSEN;
+@@ -2389,6 +2383,25 @@ static int atmel_serial_probe(struct platform_device *pdev)
+ 	port = &atmel_ports[ret];
+ 	port->backup_imr = 0;
+ 	port->uart.line = ret;
++	port->rts_gpio = -EINVAL; /* Invalid, zero could be valid */
++	if (pdata)
++		port->rts_gpio = pdata->rts_gpio;
++	else if (np)
++		port->rts_gpio = of_get_named_gpio(np, "rts-gpios", 0);
++
++	if (gpio_is_valid(port->rts_gpio)) {
++		ret = devm_gpio_request(&pdev->dev, port->rts_gpio, "RTS");
++		if (ret) {
++			dev_err(&pdev->dev, "error requesting RTS GPIO\n");
++			goto err;
++		}
++		/* Default to 1 as RTS is active low */
++		ret = gpio_direction_output(port->rts_gpio, 1);
++		if (ret) {
++			dev_err(&pdev->dev, "error setting up RTS GPIO\n");
++			goto err;
++		}
++	}
+ 
+ 	ret = atmel_init_port(port, pdev);
+ 	if (ret)
+diff --git a/include/linux/platform_data/atmel.h b/include/linux/platform_data/atmel.h
+index cea9f70..e26b0c1 100644
+--- a/include/linux/platform_data/atmel.h
++++ b/include/linux/platform_data/atmel.h
+@@ -84,6 +84,7 @@ struct atmel_uart_data {
+ 	short			use_dma_rx;	/* use receive DMA? */
+ 	void __iomem		*regs;		/* virt. base address, if any */
+ 	struct serial_rs485	rs485;		/* rs485 settings */
++	int			rts_gpio;	/* optional RTS GPIO */
+ };
+ 
+  /* Touchscreen Controller */
+-- 
+1.9.3
+

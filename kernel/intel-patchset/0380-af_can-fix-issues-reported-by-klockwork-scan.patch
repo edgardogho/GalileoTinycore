@@ -1,0 +1,34 @@
+From 2150d1acdf2b037b406b4688f688ebeac913a6b4 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Fri, 4 Dec 2015 15:55:32 +0000
+Subject: [PATCH 380/389] af_can: fix issues reported by klockwork scan
+
+KW ID:206459
+
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+
+Change-Id: I11d5657cd6a872e3bc03d4e9cc13a47ab7ee8673
+---
+ net/can/af_can.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/can/af_can.c b/net/can/af_can.c
+index c3aaf44..eced571 100644
+--- a/net/can/af_can.c
++++ b/net/can/af_can.c
+@@ -1049,9 +1049,11 @@ static int can_set_link_af(struct net_device *dev, const struct nlattr *nla)
+ 			ret = -EPROTONOSUPPORT;
+ 		else
+ 			ret = cp->rtnl_link_ops->set_link_af(dev, prot);
+-		can_put_proto(cp);
++
+ 		if (ret < 0)
+ 			return ret;
++
++		can_put_proto(cp);
+ 	}
+ 	return 0;
+ }
+-- 
+1.9.3
+

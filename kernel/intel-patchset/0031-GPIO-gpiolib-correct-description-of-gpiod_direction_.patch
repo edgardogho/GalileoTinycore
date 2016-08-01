@@ -1,0 +1,32 @@
+From 9c2fffd612f2ba06810d5f144e442bc33a1c477c Mon Sep 17 00:00:00 2001
+From: Rahul Bedarkar <rahulbedarkar89@gmail.com>
+Date: Sat, 8 Feb 2014 11:55:25 +0530
+Subject: [PATCH 031/389] GPIO: gpiolib: correct description of
+ gpiod_direction_output
+
+Signed-off-by: Rahul Bedarkar <rahulbedarkar89@gmail.com>
+Reviewed-by: Alexandre Courbot <acourbot@nvidia.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+(cherry picked from commit 90df4fe07f9794984bd2dafd1d28acd45318d37f)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ drivers/gpio/gpiolib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index 80da9f1..9b241bc 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -1848,7 +1848,7 @@ int gpiod_direction_output_raw(struct gpio_desc *desc, int value)
+ EXPORT_SYMBOL_GPL(gpiod_direction_output_raw);
+ 
+ /**
+- * gpiod_direction_output - set the GPIO direction to input
++ * gpiod_direction_output - set the GPIO direction to output
+  * @desc:	GPIO to set to output
+  * @value:	initial output value of the GPIO
+  *
+-- 
+1.9.3
+

@@ -1,0 +1,38 @@
+From f4f91810a97872792de2078d4da4dd111287cd30 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Wed, 8 Jul 2015 08:19:05 +0100
+Subject: [PATCH 346/389] platform: x86: thermal: add dependence of quark
+ thermal config. RTC# 114947
+
+Change made by Pengyu Ma as part of Windriver kernel patch
+
+quark thermal depends on THERMAL,
+and when THERMAL is set as module, quark thermal should be module too.
+
+Signed-off-by: Pengyu Ma <pengyu.ma@windriver.com>
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+Change-Id: I63ff59650ecc749a9b0d1e9af8f5bd052fffb562
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5616
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/platform/x86/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/platform/x86/Kconfig b/drivers/platform/x86/Kconfig
+index b754e62..1c26a0a 100644
+--- a/drivers/platform/x86/Kconfig
++++ b/drivers/platform/x86/Kconfig
+@@ -687,8 +687,8 @@ config INTEL_MFLD_THERMAL
+          platform.
+ 
+ config INTEL_QRK_THERMAL
+-	bool "Thermal driver for Intel Quark platform"
+-	depends on X86_INTEL_QUARK
++	tristate "Thermal driver for Intel Quark platform"
++	depends on X86_INTEL_QUARK && THERMAL
+ 	help
+ 	  Say Y here to enable Quark's Thermal driver plus the MSI's
+ 	  that can be hooked from the thermal sub-system
+-- 
+1.9.3
+

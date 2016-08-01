@@ -1,0 +1,62 @@
+From 2fe1e56ac62e8928412d10352ed70f081a827533 Mon Sep 17 00:00:00 2001
+From: Huacai Chen <chenhc@lemote.com>
+Date: Thu, 27 Nov 2014 21:05:34 +0800
+Subject: [PATCH 195/389] stmmac: platform: Move plat_dat checking earlier
+
+Original code only check/alloc plat_dat for the CONFIG_OF case, this
+patch check/alloc it earlier and unconditionally to avoid kernel build
+warnings:
+
+drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:275
+stmmac_pltfr_probe() warn: variable dereferenced before check 'plat_dat'
+
+V2: Fix coding style.
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 28603d13997e2ef47f18589cc9a44553aad49c86)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 07054ce..4032b17 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -276,6 +276,15 @@ static int stmmac_pltfr_probe(struct platform_device *pdev)
+ 
+ 	plat_dat = dev_get_platdata(&pdev->dev);
+ 
++	if (!plat_dat)
++		plat_dat = devm_kzalloc(&pdev->dev,
++					sizeof(struct plat_stmmacenet_data),
++					GFP_KERNEL);
++	if (!plat_dat) {
++		pr_err("%s: ERROR: no memory", __func__);
++		return  -ENOMEM;
++	}
++
+ 	/* Set default value for multicast hash bins */
+ 	plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
+ 
+@@ -283,15 +292,6 @@ static int stmmac_pltfr_probe(struct platform_device *pdev)
+ 	plat_dat->unicast_filter_entries = 1;
+ 
+ 	if (pdev->dev.of_node) {
+-		if (!plat_dat)
+-			plat_dat = devm_kzalloc(&pdev->dev,
+-					sizeof(struct plat_stmmacenet_data),
+-					GFP_KERNEL);
+-		if (!plat_dat) {
+-			pr_err("%s: ERROR: no memory", __func__);
+-			return  -ENOMEM;
+-		}
+-
+ 		ret = stmmac_probe_config_dt(pdev, plat_dat, &mac);
+ 		if (ret) {
+ 			pr_err("%s: main dt probe failed", __func__);
+-- 
+1.9.3
+

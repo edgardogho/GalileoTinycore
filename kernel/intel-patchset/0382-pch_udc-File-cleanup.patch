@@ -1,0 +1,147 @@
+From b56544d2d940aab0c71234ddc61d89fb041040f3 Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Thu, 10 Dec 2015 14:52:25 +0000
+Subject: [PATCH 382/389] pch_udc: File cleanup
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/usb/gadget/pch_gpio_vbus.c    |  9 ++++-----
+ drivers/usb/gadget/pch_udc.c          | 18 ++++++++++--------
+ include/linux/platform_data/pch_udc.h |  8 ++++----
+ include/linux/usb/pch_gpio_vbus.h     |  1 -
+ 4 files changed, 18 insertions(+), 18 deletions(-)
+ mode change 100644 => 100755 drivers/usb/gadget/pch_gpio_vbus.c
+ mode change 100644 => 100755 include/linux/platform_data/pch_udc.h
+ mode change 100644 => 100755 include/linux/usb/pch_gpio_vbus.h
+
+diff --git a/drivers/usb/gadget/pch_gpio_vbus.c b/drivers/usb/gadget/pch_gpio_vbus.c
+old mode 100644
+new mode 100755
+index 74c20cb..32cb1a4
+--- a/drivers/usb/gadget/pch_gpio_vbus.c
++++ b/drivers/usb/gadget/pch_gpio_vbus.c
+@@ -11,8 +11,9 @@
+  * more details.
+  */
+ 
+-/* Driver loaded by kernel when BSP creates a pch-gpio-vbus platform device.
+- * Used for passing the pdata from BSP layer to PCI driver layer
++/*
++ * Driver for when the BSP creates a pch-gpio-vbus platform device.
++ * Used for passing the pdata from BSP layer to the PCI driver layer
+  */
+ 
+ #include <linux/module.h>
+@@ -21,14 +22,12 @@
+ 
+ static struct pch_udc_platform_data *pdata;
+ 
+-
+ struct pch_udc_platform_data *get_pch_udc_platform_data(void)
+ {
+ 	return pdata;
+ }
+ EXPORT_SYMBOL_GPL(get_pch_udc_platform_data);
+ 
+-
+ static int pch_udc_gpio_vbus_probe(struct platform_device *pdev)
+ {
+ 	dev_info(&pdev->dev, "Probing driver...\n");
+@@ -51,7 +50,7 @@ static struct platform_driver pch_udc_gpio_vbus_driver = {
+ };
+ module_platform_driver(pch_udc_gpio_vbus_driver);
+ 
+-MODULE_AUTHOR("Bogdan Pricop <bogdan.pricop@emutex.com>");
++MODULE_AUTHOR("Intel Corporation");
+ MODULE_DESCRIPTION("USB pch-udc platform data");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("platform:pch_gpio_vbus");
+diff --git a/drivers/usb/gadget/pch_udc.c b/drivers/usb/gadget/pch_udc.c
+index 842bac0..343f5db 100755
+--- a/drivers/usb/gadget/pch_udc.c
++++ b/drivers/usb/gadget/pch_udc.c
+@@ -33,8 +33,10 @@ static unsigned int phy_err_time = 100;
+ module_param(phy_err_time, uint, S_IRUGO | S_IWUSR);
+ MODULE_PARM_DESC(phy_err_time, "delay time between disconnect in milliseconds");
+ 
+-static unsigned long  phy_err_time_jiffies;	/* delay time between disconnect  */
+-static unsigned long  phy_err_backoff_end;	/* timeout for PHY ERR disconnect */
++/* delay time between disconnect */
++static unsigned long  phy_err_time_jiffies;
++/* timeout for PHY ERR disconnect */
++static unsigned long  phy_err_backoff_end;
+ 
+ /* GPIO port for VBUS detecting */
+ static int vbus_gpio_port = -1;		/* GPIO port number (-1:Not used) */
+@@ -3182,12 +3184,10 @@ static void pch_udc_remove(struct pci_dev *pdev)
+ 
+ 	pch_udc_exit(dev);
+ 
+-	if (dev->irq_registered)
+-		{
++	if (dev->irq_registered) {
+ 		free_irq(pdev->irq, dev);
+-		if (enable_msi){
++		if (enable_msi)
+ 			pci_disable_msi(pdev);
+-		}
+ 	}
+ 	if (dev->base_addr)
+ 		iounmap(dev->base_addr);
+@@ -3252,9 +3252,11 @@ static int pch_udc_probe(struct pci_dev *pdev,
+ 		goto finished;
+ 	}
+ 
+-	/* If the driver runs on a HW platform which supports GPIO VBUS sensing
++	/*
++	 * If the driver runs on a HW platform which supports GPIO VBUS sensing
+ 	 * and the BSP layer initialises the platform data structure, get it
+-	 * through pch-gpio-vbus driver */
++	 * through pch-gpio-vbus driver
++	 */
+ #ifdef CONFIG_USB_EG20T_GPIO_VBUS
+ 	dev_info(&pdev->dev, "GPIO VBUS support present!\n");
+ 	struct pch_udc_platform_data *pdata = NULL;
+diff --git a/include/linux/platform_data/pch_udc.h b/include/linux/platform_data/pch_udc.h
+old mode 100644
+new mode 100755
+index dd462e1..3a82b3b
+--- a/include/linux/platform_data/pch_udc.h
++++ b/include/linux/platform_data/pch_udc.h
+@@ -1,5 +1,5 @@
+ /*
+- * Intel QRK/EG20T OCH/LAPIS Semiconductor UDC driver
++ * Intel QUARK/EG20T OCH/LAPIS Semiconductor UDC driver
+  *
+  * Copyright(c) 2015 Intel Corporation
+  *
+@@ -18,11 +18,11 @@
+ 
+ /**
+  * struct pch_udc_platform_data - Structure holding GPIO informaton
+- *					for detecting VBUS
+- * @vbus_gpio_port:		gpio port number
++ *				  for detecting VBUS
++ * @vbus_gpio_port: gpio port number
+  */
+ struct pch_udc_platform_data {
+-	int		    vbus_gpio_port;
++	int	vbus_gpio_port;
+ };
+ 
+ #endif /* LINUX_PLATFORM_DATA_PCH_UDC_H */
+diff --git a/include/linux/usb/pch_gpio_vbus.h b/include/linux/usb/pch_gpio_vbus.h
+old mode 100644
+new mode 100755
+index 91cea1e..ac88e1e
+--- a/include/linux/usb/pch_gpio_vbus.h
++++ b/include/linux/usb/pch_gpio_vbus.h
+@@ -21,5 +21,4 @@
+  */
+ struct pch_udc_platform_data *get_pch_udc_platform_data(void);
+ 
+-
+ #endif /* PCH_GPIO_VBUS_H */
+-- 
+1.9.3
+

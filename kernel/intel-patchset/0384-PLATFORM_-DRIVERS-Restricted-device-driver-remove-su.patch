@@ -1,0 +1,120 @@
+From a0e05928de53265a283052e48db1695a3c0fa98e Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Fri, 11 Dec 2015 11:15:41 +0000
+Subject: [PATCH 384/389] PLATFORM_ DRIVERS: Restricted device driver remove
+ support
+
+Updated the restricted GPIO drivers to handle the unloading of the devices
+before the platform device has been fully loaded
+
+This affects
+	Clanton Peak
+	Cross Hill
+
+RTC # 127341
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ .../x86/intel-quark/intel_quark_platform_clanton_peak.c    | 14 ++++++++++++++
+ .../x86/intel-quark/intel_quark_platform_cross_hill.c      | 14 ++++++++++++++
+ 2 files changed, 28 insertions(+)
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
+old mode 100644
+new mode 100755
+index 7c2005f..703ecc0
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
+@@ -248,6 +248,12 @@ static int intel_qrk_gpio_restrict_probe_nc(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++static int intel_qrk_gpio_restrict_remove_nc(struct platform_device *pdev)
++{
++	nc_gpio_reg = 0;
++	return 0;
++}
++
+ static int intel_qrk_gpio_restrict_probe_sc(struct platform_device *pdev)
+ {
+ 	int ret = 0;
+@@ -263,12 +269,19 @@ static int intel_qrk_gpio_restrict_probe_sc(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++static int intel_qrk_gpio_restrict_remove_sc(struct platform_device *pdev)
++{
++	sc_gpio_reg = 0;
++	return 0;
++}
++
+ static struct platform_driver gpio_restrict_pdriver_nc = {
+ 	.driver		= {
+ 		.name	= GPIO_RESTRICT_NAME_NC,
+ 		.owner	= THIS_MODULE,
+ 	},
+ 	.probe		= intel_qrk_gpio_restrict_probe_nc,
++	.remove		= intel_qrk_gpio_restrict_remove_nc,
+ };
+ 
+ static struct platform_driver gpio_restrict_pdriver_sc = {
+@@ -277,6 +290,7 @@ static struct platform_driver gpio_restrict_pdriver_sc = {
+ 		.owner	= THIS_MODULE,
+ 	},
+ 	.probe		= intel_qrk_gpio_restrict_probe_sc,
++	.remove		= intel_qrk_gpio_restrict_remove_sc,
+ };
+ 
+ static int intel_qrk_plat_clanton_peak_probe(struct platform_device *pdev)
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c b/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
+old mode 100644
+new mode 100755
+index a071210..af54397
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
+@@ -451,6 +451,12 @@ static int intel_qrk_gpio_restrict_probe_nc(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static int intel_qrk_gpio_restrict_remove_nc(struct platform_device *pdev)
++{
++	nc_gpio_reg = 0;
++	return 0;
++}
++
+ /**
+  * intel_qrk_gpio_restrict_probe_sc
+  *
+@@ -474,12 +480,19 @@ static int intel_qrk_gpio_restrict_probe_sc(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static int intel_qrk_gpio_restrict_remove_sc(struct platform_device *pdev)
++{
++	sc_gpio_reg = 0;
++	return 0;
++}
++
+ static struct platform_driver gpio_restrict_pdriver_nc = {
+ 	.driver		= {
+ 		.name	= GPIO_RESTRICT_NAME_NC,
+ 		.owner	= THIS_MODULE,
+ 	},
+ 	.probe		= intel_qrk_gpio_restrict_probe_nc,
++	.remove		= intel_qrk_gpio_restrict_remove_nc,
+ };
+ static struct platform_driver gpio_restrict_pdriver_sc = {
+ 	.driver		= {
+@@ -487,6 +500,7 @@ static struct platform_driver gpio_restrict_pdriver_sc = {
+ 		.owner	= THIS_MODULE,
+ 	},
+ 	.probe		= intel_qrk_gpio_restrict_probe_sc,
++	.remove		= intel_qrk_gpio_restrict_remove_sc,
+ };
+ 
+ static int intel_qrk_plat_cross_hill_probe(struct platform_device *pdev)
+-- 
+1.9.3
+

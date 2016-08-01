@@ -1,0 +1,53 @@
+From 45d5d75748503924add3701a1593fd634c0d3d0b Mon Sep 17 00:00:00 2001
+From: "Arumugam,Kamenee" <kamenee.arumugam@intel.com>
+Date: Tue, 31 Mar 2015 15:01:51 +0800
+Subject: [PATCH 219/389] iio: accel: lis331dlh: Add header for the LIS331DLH
+ driver
+
+This patch is to add the header for the LIS331DLH accelerometer
+driver.
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ include/linux/platform_data/lis331dlh_intel_qrk.h | 29 +++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 include/linux/platform_data/lis331dlh_intel_qrk.h
+
+diff --git a/include/linux/platform_data/lis331dlh_intel_qrk.h b/include/linux/platform_data/lis331dlh_intel_qrk.h
+new file mode 100644
+index 0000000..4575934
+--- /dev/null
++++ b/include/linux/platform_data/lis331dlh_intel_qrk.h
+@@ -0,0 +1,29 @@
++/*
++ * Platform data for Intel Clanton Hill platform accelerometer driver
++ *
++ * Copyright(c) 2013 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details
++ *
++ */
++
++#ifndef __LINUX_PLATFORM_DATA_LIS331DLH_INTEL_QRK_H__
++#define __LINUX_PLATFORM_DATA_LIS331DLH_INTEL_QRK_H__
++
++/**
++ * struct lis331dlh_intel_qrk_platform_data - Platform data for the ST Micro
++ *                                            accelerometer driver
++ * @irq2_pin: GPIO pin number for the threshold interrupt(INT2).
++ **/
++struct lis331dlh_intel_qrk_platform_data {
++	int irq2_pin;
++};
++
++#endif /* LINUX_PLATFORM_DATA_LIS331DLH_INTEL_QRK_H_ */
+-- 
+1.9.3
+

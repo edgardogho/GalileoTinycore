@@ -1,0 +1,51 @@
+From 1decf805bfaee101dfa05e3a819fb923133b8de6 Mon Sep 17 00:00:00 2001
+From: Pengyu Ma <pengyu.ma@windriver.com>
+Date: Mon, 13 Jul 2015 17:13:05 +0800
+Subject: [PATCH 350/389] quark platform clanton hill: fix compiling warning
+
+Those warning shown in clanton hill platform driver:
+drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c:84:2:
+warning: initialization discards 'const' qualifier from pointer target type
+  .default_lis331dlh_pdata = &lis331dlh_pdata,
+  ^
+drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c:106:2:
+warning: initialization discards 'const' qualifier from pointer target type
+  .platform_data = &lis331dlh_i2c_platform_data,
+
+Fixed the implict conversion to avoid these warnings.
+
+Signed-off-by: Pengyu Ma <pengyu.ma@windriver.com>
+Signed-off-by: Kartikey Parmar <kartikeyx.r.parmar@intel.com>
+Change-Id: Ia8f280d90222fb13e88786ad4e42e1e4daa254b2
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5916
+Reviewed-by: Tan, Raymond <raymond.tan@intel.com>
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
+index 5d564a7..b35f171 100644
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
+@@ -90,7 +90,7 @@ static const struct st_sensors_platform_data lis331dlh_pdata = {
+ 
+ static const struct lis331dlh_intel_qrk_platform_data lis331dlh_i2c_platform_data = {
+ 	.irq2_pin = ST_ACCEL_GPIO_S3,
+-	.default_lis331dlh_pdata = &lis331dlh_pdata,
++	.default_lis331dlh_pdata = (struct st_sensors_platform_data *)&lis331dlh_pdata,
+ };
+ 
+ static struct gpio reserved_gpios[] = {
+@@ -112,7 +112,7 @@ static struct gpio reserved_gpios[] = {
+ 
+ static struct i2c_adapter *i2c_adap;
+ static struct i2c_board_info probed_i2c_lis331dlh = {
+-	.platform_data = &lis331dlh_i2c_platform_data,
++	.platform_data = (void *)&lis331dlh_i2c_platform_data,
+ };
+ static struct i2c_board_info probed_i2c_max9867;
+ static const unsigned short max9867_i2c_addr[] =
+-- 
+1.9.3
+

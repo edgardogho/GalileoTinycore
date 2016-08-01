@@ -1,0 +1,46 @@
+From 1e311652d8d150c3be5cf7a143f461ed105344b4 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Tue, 14 Jul 2015 12:33:37 +0100
+Subject: [PATCH 348/389] Fix ioremap for intel quark board data. RTC# 114938
+
+Change made by Zhang Jia as part of Windriver kernel patch
+
+ioremap() should not map platform data area cross the 4G boundary.
+The fix maps a proper region for accessing platform data area to
+avoid if overflow check is applied to walk_system_ram_range()
+and the ioremap() called in quark would fails.
+
+Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+Change-Id: Ib13e85494d0bbc174bc3caab635e33977c83883c
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5721
+Reviewed-by: Tan, Raymond <raymond.tan@intel.com>
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/platform/x86/intel-quark/intel_quark_board_data.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_board_data.c b/drivers/platform/x86/intel-quark/intel_quark_board_data.c
+index 0d8c9ab..1304bf5 100644
+--- a/drivers/platform/x86/intel-quark/intel_quark_board_data.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_board_data.c
+@@ -32,6 +32,7 @@
+ #define SPIFLASH_BASEADDR			0xFFF00000
+ #define MFH_OFFSET				0x00008000
+ #define PLATFORM_DATA_OFFSET			0x00010000
++#define PLATFORM_DATA_SIZE			0x20000
+ #define MTD_PART_OFFSET				0x00050000
+ #define MTD_PART_LEN				0x00040000
+ #define MFH_PADDING				0x1E8
+@@ -170,7 +171,7 @@ static int __init intel_qrk_board_data_init_legacy(void)
+ 	void __iomem *spi_data;
+ 	int ret = 0;
+ 
+-	spi_data = ioremap(SPIFLASH_BASEADDR, FLASH_SIZE);
++	spi_data = ioremap(SPIFLASH_BASEADDR, PLATFORM_DATA_OFFSET + PLATFORM_DATA_SIZE);
+ 	if (!spi_data)
+ 		return -ENODEV;
+ 
+-- 
+1.9.3
+

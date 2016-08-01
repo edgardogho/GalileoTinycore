@@ -1,0 +1,47 @@
+From d5e3dd664cab01e31801b94818a9134e75ea9a2f Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Wed, 8 Jul 2015 07:33:08 +0100
+Subject: [PATCH 345/389] net: stmmac: fix a circular locking dependency
+
+Change made by Zhang Xiao as part of Windriver kernel patch
+
+netif_tx_lock spinlock as A, the tx_lock of stmmac's private
+structure as B. In ndo_start_xmit process, A->B. While in function
+stmmac_tx_clean, changed to B->A. In fact, it is not necessary
+to hold the tx_lock for all the function stmmac_tx_clean.
+Shrink its scope to avoid the conflict.
+
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+Change-Id: I4b8a87be5d1be79d0ade21b88f087611274a7005
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5613
+Reviewed-by: Tan, Raymond <raymond.tan@intel.com>
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 01ca331..904f6587 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1372,6 +1372,8 @@ static void stmmac_tx_clean(struct stmmac_priv *priv)
+ 
+ 	netdev_completed_queue(priv->dev, pkts_compl, bytes_compl);
+ 
++	spin_unlock(&priv->tx_lock);
++
+ 	if (unlikely(netif_queue_stopped(priv->dev) &&
+ 		     stmmac_tx_avail(priv) > STMMAC_TX_THRESH(priv))) {
+ 		netif_tx_lock(priv->dev);
+@@ -1388,7 +1390,6 @@ static void stmmac_tx_clean(struct stmmac_priv *priv)
+ 		stmmac_enable_eee_mode(priv);
+ 		mod_timer(&priv->eee_ctrl_timer, STMMAC_LPI_T(eee_timer));
+ 	}
+-	spin_unlock(&priv->tx_lock);
+ }
+ 
+ static inline void stmmac_enable_dma_irq(struct stmmac_priv *priv)
+-- 
+1.9.3
+

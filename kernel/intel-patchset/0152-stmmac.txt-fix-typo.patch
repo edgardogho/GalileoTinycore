@@ -1,0 +1,31 @@
+From f5e80f63b9dea81663317139461d41f3adfeb9c1 Mon Sep 17 00:00:00 2001
+From: Pavel Machek <pavel@denx.de>
+Date: Mon, 18 Aug 2014 23:59:28 +0200
+Subject: [PATCH 152/389] stmmac.txt: fix typo
+
+Fix typo in devicetree example.
+
+Signed-off-by: Pavel Machek <pavel@denx.de>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+(cherry picked from commit 924064e93970a1b45d83ac67165f0570f4649e0f)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ Documentation/devicetree/bindings/net/stmmac.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/stmmac.txt b/Documentation/devicetree/bindings/net/stmmac.txt
+index cddcc7f..f1db832 100644
+--- a/Documentation/devicetree/bindings/net/stmmac.txt
++++ b/Documentation/devicetree/bindings/net/stmmac.txt
+@@ -57,5 +57,5 @@ Examples:
+ 		snps,multicast-filter-bins = <256>;
+ 		snps,perfect-filter-entries = <128>;
+ 		clocks = <&clock>;
+-		clock-names = "stmmaceth">;
++		clock-names = "stmmaceth";
+ 	};
+-- 
+1.9.3
+

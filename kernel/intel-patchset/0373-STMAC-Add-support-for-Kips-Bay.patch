@@ -1,0 +1,34 @@
+From 3a89f55c0e4f749312a73590e18d33c4a33adc1b Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Tue, 1 Dec 2015 17:48:45 +0000
+Subject: [PATCH 373/389] STMAC: Add support for Kips Bay
+
+RTC# 121574
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+ mode change 100644 => 100755 drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+old mode 100644
+new mode 100755
+index 428261f..9c7a2f9
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -192,6 +192,11 @@ static struct stmmac_pci_dmi_data quark_pci_dmi_data[] = {
+ 		.func = 7,
+ 		.phy_addr = 1,
+ 	},
++	{
++		.name = "KipsBay",
++		.func = 6,
++		.phy_addr = 1,
++	},
+ 	{}
+ };
+ 
+-- 
+1.9.3
+

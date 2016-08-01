@@ -1,0 +1,30 @@
+From 38c8d1398003ab1d127f877145616308ad23ee85 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Fri, 4 Dec 2015 16:13:42 +0000
+Subject: [PATCH 377/389] SLCAN: fix issues reported by klockwork scan
+
+KlockWork ID:205864, 205865
+
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+
+Change-Id: Iba0424ff4613093c172c76454b249b8225f9dfa7
+---
+ drivers/net/can/slcan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/can/slcan.c b/drivers/net/can/slcan.c
+index 39a6550..6e21c71 100644
+--- a/drivers/net/can/slcan.c
++++ b/drivers/net/can/slcan.c
+@@ -249,7 +249,7 @@ static void slc_bump(struct slcan *sl)
+ 
+ 	dev_idx = frame_type_pos ? sl->rbuff[0] - '0' : 0;
+ 
+-	if (sl->dev[dev_idx] == NULL)
++	if (dev_idx >= MUX_NETDEV_MAX || sl->dev[dev_idx] == NULL)
+ 		return;
+ 
+ 	skb->dev = sl->dev[dev_idx];
+-- 
+1.9.3
+

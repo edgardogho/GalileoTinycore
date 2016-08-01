@@ -1,0 +1,46 @@
+From 0a902362f624b7b8b833950829a2f165b343aa5b Mon Sep 17 00:00:00 2001
+From: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+Date: Fri, 13 Mar 2015 14:38:40 +0800
+Subject: [PATCH 217/389] Stmmac: Clanton Hill, Cross Hill: add PHY descriptors
+
+The PHY descriptors are added for Clanton and Cross Hill Platforms.
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+index 4edbc7e..f9af91e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
+@@ -138,6 +138,26 @@ static struct stmmac_pci_dmi_data quark_pci_dmi_data[] = {
+ 		.func = 6,
+ 		.phy_addr = 1,
+ 	},
++	{
++		.name = "ClantonHill",
++		.func = 6,
++		.phy_addr = 1,
++	},
++	{
++		.name = "ClantonHill",
++		.func = 7,
++		.phy_addr = 1,
++	},
++	{
++		.name = "CrossHill",
++		.func = 6,
++		.phy_addr = 1,
++	},
++	{
++		.name = "CrossHill",
++		.func = 7,
++		.phy_addr = 1,
++	},
+ 	{}
+ };
+ 
+-- 
+1.9.3
+

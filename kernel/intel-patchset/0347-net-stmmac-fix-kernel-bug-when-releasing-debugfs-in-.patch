@@ -1,0 +1,42 @@
+From ce88de09ebc2f1afe855136acdde8bb452cf8791 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Wed, 8 Jul 2015 08:36:26 +0100
+Subject: [PATCH 347/389] net: stmmac: fix kernel bug when releasing debugfs in
+ stmmac. RTC# 114949
+
+Change made by Zhang Jia as part of Windriver kernel patch
+
+debugfs for stmmac driver is limited to be registered/unregistered one time
+only because the registration/unregistration of debugfs for stmmac
+driver is called along with adding/removing each interface. For
+a multiple interface system, this counter should ensure the unregistration
+of debugfs is called one time.
+
+Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+Change-Id: I6b60dac748a925e0647172948d9b153c53712c29
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/5617
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 904f6587..b390ecc 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1915,7 +1915,10 @@ static int stmmac_release(struct net_device *dev)
+ 	netif_carrier_off(dev);
+ 
+ #ifdef CONFIG_DEBUG_FS
+-	stmmac_exit_fs();
++	if (debugfs_registered) {
++		debugfs_registered = 0;
++		stmmac_exit_fs();
++	}
+ #endif
+ 
+ 	stmmac_release_ptp(priv);
+-- 
+1.9.3
+

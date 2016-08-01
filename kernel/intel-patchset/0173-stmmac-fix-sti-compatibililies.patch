@@ -1,0 +1,55 @@
+From 9d9dad2bf2d85908c8920fc32b7a73422fff97a3 Mon Sep 17 00:00:00 2001
+From: Giuseppe CAVALLARO <peppe.cavallaro@st.com>
+Date: Wed, 15 Oct 2014 07:30:41 +0200
+Subject: [PATCH 173/389] stmmac: fix sti compatibililies
+
+this patch is to fix the stmmac data compatibilities for
+all the SoCs inside the platform file.
+
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 71ae8f5271b31da1172751059deb8bfc32b2b759)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h          | 3 ++-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 8 ++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 4452889..c3c4065 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -144,7 +144,8 @@ extern const struct stmmac_of_data meson6_dwmac_data;
+ extern const struct stmmac_of_data sun7i_gmac_data;
+ #endif
+ #ifdef CONFIG_DWMAC_STI
+-extern const struct stmmac_of_data sti_gmac_data;
++extern const struct stmmac_of_data stih4xx_dwmac_data;
++extern const struct stmmac_of_data stid127_dwmac_data;
+ #endif
+ #ifdef CONFIG_DWMAC_SOCFPGA
+ extern const struct stmmac_of_data socfpga_gmac_data;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 0d6b9ad..db56fa7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -37,10 +37,10 @@ static const struct of_device_id stmmac_dt_ids[] = {
+ 	{ .compatible = "allwinner,sun7i-a20-gmac", .data = &sun7i_gmac_data},
+ #endif
+ #ifdef CONFIG_DWMAC_STI
+-	{ .compatible = "st,stih415-dwmac", .data = &sti_gmac_data},
+-	{ .compatible = "st,stih416-dwmac", .data = &sti_gmac_data},
+-	{ .compatible = "st,stid127-dwmac", .data = &sti_gmac_data},
+-	{ .compatible = "st,stih407-dwmac", .data = &sti_gmac_data},
++	{ .compatible = "st,stih415-dwmac", .data = &stih4xx_dwmac_data},
++	{ .compatible = "st,stih416-dwmac", .data = &stih4xx_dwmac_data},
++	{ .compatible = "st,stid127-dwmac", .data = &stid127_dwmac_data},
++	{ .compatible = "st,stih407-dwmac", .data = &stih4xx_dwmac_data},
+ #endif
+ #ifdef CONFIG_DWMAC_SOCFPGA
+ 	{ .compatible = "altr,socfpga-stmmac", .data = &socfpga_gmac_data },
+-- 
+1.9.3
+

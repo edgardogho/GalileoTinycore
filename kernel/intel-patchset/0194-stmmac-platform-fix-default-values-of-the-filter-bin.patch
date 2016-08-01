@@ -1,0 +1,57 @@
+From 754e1a067597590bc4d37a4a776376b4cef3d6b3 Mon Sep 17 00:00:00 2001
+From: Huacai Chen <chenhc@lemote.com>
+Date: Wed, 26 Nov 2014 10:38:06 +0800
+Subject: [PATCH 194/389] stmmac: platform: fix default values of the filter
+ bins setting
+
+The commit 3b57de958e2a brought the support for a different amount of
+the filter bins, but didn't update the platform driver that without
+CONFIG_OF.
+
+Fixes: 3b57de958e2a (net: stmmac: Support devicetree configs for mcast
+and ucast filter entries)
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Acked-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 571dcfde23712b92e45a126f415d9424af0c2886)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 15814b7..07054ce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -188,12 +188,6 @@ static int stmmac_probe_config_dt(struct platform_device *pdev,
+ 	 */
+ 	plat->maxmtu = JUMBO_LEN;
+ 
+-	/* Set default value for multicast hash bins */
+-	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+-
+-	/* Set default value for unicast filter entries */
+-	plat->unicast_filter_entries = 1;
+-
+ 	/*
+ 	 * Currently only the properties needed on SPEAr600
+ 	 * are provided. All other properties should be added
+@@ -281,6 +275,13 @@ static int stmmac_pltfr_probe(struct platform_device *pdev)
+ 		return PTR_ERR(addr);
+ 
+ 	plat_dat = dev_get_platdata(&pdev->dev);
++
++	/* Set default value for multicast hash bins */
++	plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
++
++	/* Set default value for unicast filter entries */
++	plat_dat->unicast_filter_entries = 1;
++
+ 	if (pdev->dev.of_node) {
+ 		if (!plat_dat)
+ 			plat_dat = devm_kzalloc(&pdev->dev,
+-- 
+1.9.3
+

@@ -1,0 +1,50 @@
+From 313b6b50fdffa16b86ee9b2a9310937ce1ab880a Mon Sep 17 00:00:00 2001
+From: Fabrice Gasnier <fabrice.gasnier@st.com>
+Date: Tue, 4 Nov 2014 17:08:05 +0100
+Subject: [PATCH 178/389] stmmac: fix stmmac_tx_avail should be called with TX
+ locked
+
+stmmac_tx_avail() may lie if used unprotected. It's using cur_tx
+and dirty_tx index. These index may be already in use by tx_clean
+when entering xmit routine. So, this should be called locked.
+
+This can cause transmit queue to be stuck, with following message:
+NETDEV WATCHDOG: eth0 (stmmaceth): transmit queue 0 timed out
+
+Signed-off-by: Fabrice Gasnier <fabrice.gasnier@st.com>
+Acked-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 16ee817e4365cdfe665ae8d6f6bc8f09befa1272)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 83b4c6f..1953a8c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1894,7 +1894,10 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	unsigned int nopaged_len = skb_headlen(skb);
+ 	unsigned int enh_desc = priv->plat->enh_desc;
+ 
++	spin_lock(&priv->tx_lock);
++
+ 	if (unlikely(stmmac_tx_avail(priv) < nfrags + 1)) {
++		spin_unlock(&priv->tx_lock);
+ 		if (!netif_queue_stopped(dev)) {
+ 			netif_stop_queue(dev);
+ 			/* This is a hard error, log it. */
+@@ -1903,8 +1906,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		return NETDEV_TX_BUSY;
+ 	}
+ 
+-	spin_lock(&priv->tx_lock);
+-
+ 	if (priv->tx_path_in_lpi_mode)
+ 		stmmac_disable_eee_mode(priv);
+ 
+-- 
+1.9.3
+

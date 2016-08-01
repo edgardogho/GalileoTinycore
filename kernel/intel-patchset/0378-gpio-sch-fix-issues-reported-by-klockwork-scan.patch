@@ -1,0 +1,41 @@
+From 6dd875439af970e58737c68b3f8f4f02c3ebe77d Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Fri, 4 Dec 2015 15:49:42 +0000
+Subject: [PATCH 378/389] gpio-sch: fix issues reported by klockwork scan
+
+KlockWork ID:206435
+
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+
+Change-Id: I707c4e830dbedf82882fea900f6770cabc3bc68d
+---
+ drivers/gpio/gpio-sch.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpio/gpio-sch.c b/drivers/gpio/gpio-sch.c
+index 058a5b7..d026737 100755
+--- a/drivers/gpio/gpio-sch.c
++++ b/drivers/gpio/gpio-sch.c
+@@ -323,16 +323,17 @@ static int sch_gpio_irq_type(struct irq_data *d, unsigned type)
+  */
+ int sch_gpio_resume_irq_set_wake(struct irq_data *d, unsigned int on)
+ {
+-	struct sch_gpio *sch = irq_data_get_irq_chip_data(d);
++	struct sch_gpio *sch = NULL;
+ 	u32 gpio_num = 0;
+ 	int ret = 0;
+ 
+ 	if (NULL == d) {
+-		dev_err(sch->chip.dev, "null irq_data\n");
++		pr_err("%s: null irq_data\n", __func__);
+ 		ret = -EFAULT;
+ 		goto end;
+ 	}
+ 
++	sch = irq_data_get_irq_chip_data(d);
+ 	gpio_num = irq_to_gpio_number();
+ 	/* This function is only relavent on resume well GPIO */
+ 	if (gpio_num < sch->resume_base) {
+-- 
+1.9.3
+

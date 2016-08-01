@@ -1,0 +1,558 @@
+From cfd9f19e47f7a484ca676b2fa067c5c1d48cf65a Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Fri, 11 Dec 2015 01:17:46 +0000
+Subject: [PATCH 387/389] Reliance Creek: Platform Driver Update
+
+Removed USB VBUS support RTC # 126619
+Restructured how the driver is probed
+Updated the GPIO names and added SoC GPIO names
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+Change-Id: I471a9630e1b0544691275cdfbdb0e6ab66ab97ac
+---
+ .../intel_quark_platform_reliance_creek.c          | 331 +++++++++++----------
+ 1 file changed, 167 insertions(+), 164 deletions(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+index 84b15ea..3791fa3 100755
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+@@ -11,59 +11,48 @@
+  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+  * more details.
+- *
+- * Author : Dan O'Donovan <dan@emutex.com> 2015
+  */
+ 
+ #include <linux/errno.h>
+ #include <linux/gpio.h>
+ #include <linux/i2c.h>
+-#include <linux/platform_data/at24.h>
+-#include <linux/io.h>
+-#include <linux/ioport.h>
+-#include <linux/module.h>
+-#include <linux/mtd/partitions.h>
+-#include <linux/mtd/physmap.h>
+ #include <linux/platform_device.h>
+-#include <linux/printk.h>
+ #include <linux/spi/pxa2xx_spi.h>
+ #include <linux/spi/spi.h>
+ #include <linux/i2c/pcf857x.h>
+ #include <linux/platform_data/tpm_i2c_infenion.h>
+-#include <linux/platform_data/pch_udc.h>
+ 
+ #define DRIVER_NAME		"RelianceCreek"
+ #define GPIO_RESTRICT_NAME_NC	"gpio-restrict-nc"
+ #define GPIO_RESTRICT_NAME_SC	"gpio-restrict-sc"
+ 
+-/* GPIO signal names from RelianceCreek board data-sheet, prefixed with GPIO_ */
++/* GPIO signal names from RelianceCreek board, prefixed with GPIO_ */
++/* GPIO<7> */
+ #define GPIO_IRQ_SPI2UART_B_BUF		15
++/* GPIO<1> */
+ #define GPIO_GPIO1_RS485_IRQ		9
+ 
+ /* GPIO line used to reset SLB9645TT */
+-#define GPIO_SLB9645TT_RESET          0
+-/* GPIO line SLB9645TT interrupt are routed to */
+-#define GPIO_SLB9645TT_INT            13
++/* GPIO<8> */
++#define GPIO_TPM_RESET_B		0
+ 
+-/* GPIO port used for VBUS detection (USBD_DET = GPIO<6>) */
+-#define GPIO_USBD_DET			14
++/* GPIO line for the SLB9645TT interrupt */
++/* GPIO<5> */
++#define GPIO_TPM_DAVINT_B		13
+ 
+-static struct pch_udc_platform_data pch_udc_pdata	= {
+-	.vbus_gpio_port	= GPIO_USBD_DET,
+-};
++/* GPIO line for quark_ffrd_spi_0_cs_0 */
++/* GPIO_SUS<2> */
++#define GPIO_SPI0_SS_B			4
++
++/* GPIO line for quark_ffrd_spi_1_cs_0 */
++/* GPIO<2> */
++#define GPIO_SPI1_SS_B			10
+ 
+-static struct platform_device pch_udc_gpio_vbus_device	= {
+-	.name			= "pch_gpio_vbus",
+-	.id			= -1,
+-	.dev			= {
+-		.platform_data	= &pch_udc_pdata,
+-	},
+-};
+ 
+ static int nc_gpio_reg;
+ static int sc_gpio_reg;
++static int gpio_reserved;
+ 
+-#include "linux/platform_data/pca953x.h"
+ #define PCF8574_GPIO_BASE_OFFSET 16
+ 
+ static struct pcf857x_platform_data pcf8574_platform_data_exp3 = {
+@@ -71,8 +60,8 @@ static struct pcf857x_platform_data pcf8574_platform_data_exp3 = {
+ };
+ 
+ static struct tpm_i2c_infenion_platform_data slb9645tt_platform_data = {
+-	.gpio_reset = GPIO_SLB9645TT_RESET,
+-	.gpio_irq = GPIO_SLB9645TT_INT,
++	.gpio_reset = GPIO_TPM_RESET_B,
++	.gpio_irq = GPIO_TPM_DAVINT_B,
+ };
+ 
+ /******************************************************************************
+@@ -115,18 +104,19 @@ static int i2c_probe(struct i2c_adapter *adap, unsigned short addr)
+  *             NXP SC16IS7XX SPI Device Platform Data
+  ******************************************************************************/
+ 
++/* Peripheral's crystal frequency */
+ static const unsigned long sc16is752_platform_data = 18432000;
+ static const unsigned long sc16is741_platform_data = 18432000;
+ 
+ /******************************************************************************
+  *                 Intel Quark SPI Controller Data
+  ******************************************************************************/
+-static struct pxa2xx_spi_chip qrk_ffrd_spi_0_cs_0 = {
+-	.gpio_cs = 4,
++static struct pxa2xx_spi_chip quark_ffrd_spi_0_cs_0 = {
++	.gpio_cs = GPIO_SPI0_SS_B,
+ };
+ 
+-static struct pxa2xx_spi_chip qrk_ffrd_spi_1_cs_0 = {
+-	.gpio_cs = 10,
++static struct pxa2xx_spi_chip quark_ffrd_spi_1_cs_0 = {
++	.gpio_cs = GPIO_SPI1_SS_B,
+ };
+ 
+ static struct spi_board_info spi_sc16is752_info = {
+@@ -135,7 +125,7 @@ static struct spi_board_info spi_sc16is752_info = {
+ 	.mode = SPI_MODE_0,
+ 	.bus_num = 0,
+ 	.chip_select = 0,
+-	.controller_data = &qrk_ffrd_spi_0_cs_0,
++	.controller_data = &quark_ffrd_spi_0_cs_0,
+ 	.platform_data = &sc16is752_platform_data,
+ };
+ 
+@@ -145,11 +135,18 @@ static struct spi_board_info spi_sc16is741_info = {
+ 	.mode = SPI_MODE_0,
+ 	.bus_num = 1,
+ 	.chip_select = 0,
+-	.controller_data = &qrk_ffrd_spi_1_cs_0,
++	.controller_data = &quark_ffrd_spi_1_cs_0,
+ 	.platform_data = &sc16is741_platform_data,
+ };
+ 
++/******************************************************************************
++ *                           Reliance Creek GPIOs
++ ******************************************************************************/
+ 
++/*
++ * Reserve the GPIOs used as interrupts to ensure no one else tries to claim
++ * them. Also reserve the TPM reset gpio.
++ */
+ static struct gpio reserved_gpios[] = {
+ 	{
+ 		GPIO_IRQ_SPI2UART_B_BUF,
+@@ -162,12 +159,12 @@ static struct gpio reserved_gpios[] = {
+ 		"sc16is741-int",
+ 	},
+ 	{
+-		GPIO_SLB9645TT_RESET,
++		GPIO_TPM_RESET_B,
+ 		GPIOF_OUT_INIT_HIGH,
+ 		"slb96455tt-reset",
+ 	},
+ 	{
+-		GPIO_SLB9645TT_INT,
++		GPIO_TPM_DAVINT_B,
+ 		GPIOF_IN,
+ 		"slb96455tt-int",
+ 	},
+@@ -175,56 +172,80 @@ static struct gpio reserved_gpios[] = {
+ 
+ static int slb9645tt_i2c_probe(struct i2c_adapter *adap, unsigned short addr)
+ {
+-	return gpio_get_value(GPIO_SLB9645TT_RESET);
++	return gpio_get_value(GPIO_TPM_RESET_B);
+ }
+ 
+ /**
+- * intel_qrk_gpio_restrict_probe
++ * intel_quark_i2c_add_onboard_devs
+  *
+- * Make GPIOs pertaining to Firmware inaccessible by requesting them.  The
+- * GPIOs are never released nor accessed by this driver.
++ * @return 0 or -EPROBE_DEFER
+  *
+- * Registers devices which are dependent on these GPIO drivers
++ * Registers onboard I2c device(s) present on the Reliance Creek platforms
++ *
++ * If any of the i2c_new_probed_device() call fail, an error message will
++ * be displayed but the probe will be allowed to continue in order to enable
++ * as much board functionality as possible.
+  */
+-static int intel_qrk_gpio_restrict_probe(void)
++static int intel_quark_i2c_add_onboard_devs(void)
+ {
+-	struct i2c_adapter *i2c_adap;
+-	struct i2c_client *slb9645tt;
+-	int ret;
++	struct i2c_adapter *i2c_adap = NULL;
++	struct i2c_client *client = NULL;
+ 
+-	/* Reserve GPIOs for I2C/SPI device interrupts (never released) */
+-	ret = gpio_request_array(reserved_gpios, ARRAY_SIZE(reserved_gpios));
+-	if (ret) {
+-		pr_err("%s: failed to request reserved gpios\n",
+-		       __func__);
+-		return ret;
++	i2c_adap = i2c_get_adapter(0);
++	if (NULL == i2c_adap) {
++		pr_info("%s: i2c adapter not ready yet. Deferring..\n",
++			__func__);
++		return -EPROBE_DEFER;
+ 	}
+ 
+ 	/*
+ 	 * Register on-board I2C devices
+ 	 */
+-	probed_slb9645tt.irq = gpio_to_irq(GPIO_SLB9645TT_INT);
++	strlcpy(probed_i2c_tmp75c.type, "tmp75c", I2C_NAME_SIZE);
++	client = i2c_new_probed_device(i2c_adap, &probed_i2c_tmp75c,
++				       tmp75c_i2c_addr, i2c_probe);
++	if (client == NULL)
++		pr_err("%s: Failed to probe tmp75c I2C device\n", __func__);
+ 
+-	i2c_adap = i2c_get_adapter(0);
+-	if (!i2c_adap) {
+-		pr_info("%s: i2c adapter not ready yet. Deferring..\n",
+-			__func__);
+-		ret = -EPROBE_DEFER;
+-		goto err;
+-	}
++	strlcpy(probed_i2c_eeprom.type, "24c64", I2C_NAME_SIZE);
++	client = i2c_new_probed_device(i2c_adap, &probed_i2c_eeprom,
++				       eeprom_i2c_addr, i2c_probe);
++	if (client == NULL)
++		pr_err("%s: Failed to probe 24c64 I2C device\n", __func__);
++
++	strlcpy(probed_i2c_pcf8574_exp3.type, "pcf8574", I2C_NAME_SIZE);
++	client = i2c_new_probed_device(i2c_adap, &probed_i2c_pcf8574_exp3,
++				       pcf8574_exp3_i2c_addr, i2c_probe);
++	if (client == NULL)
++		pr_err("%s: Failed to probe pcf8574 I2C device\n", __func__);
+ 
++	probed_slb9645tt.irq = gpio_to_irq(GPIO_TPM_DAVINT_B);
+ 	strlcpy(probed_slb9645tt.type, "slb9645tt", I2C_NAME_SIZE);
+-	slb9645tt = i2c_new_probed_device(i2c_adap, &probed_slb9645tt,
+-					  slb9645tt_i2c_addr,
+-					  slb9645tt_i2c_probe);
++	client = i2c_new_probed_device(i2c_adap, &probed_slb9645tt,
++				       slb9645tt_i2c_addr,
++				       slb9645tt_i2c_probe);
++	if (client == NULL)
++		pr_err("%s: Failed to probe slb9645tt I2C device\n", __func__);
++
+ 	i2c_put_adapter(i2c_adap);
+ 
+-	if (!slb9645tt) {
+-		pr_err("%s: can't probe slb9645tt\n", __func__);
+-		ret = -ENODEV;
+-		goto err;
+-	}
++	return 0;
++}
+ 
++/**
++ * intel_quark_spi_add_onboard_devs
++ *
++ * @return 0
++ *
++ * Registers onboard SPI device(s) present on the Reliance Creek platforms
++ *
++ * If any of the spi_register_board_info() call fail, an error message will
++ * be displayed but the probe will be allowed to continue in order to enable
++ * as much board functionality as possible.
++ */
++static int intel_quark_spi_add_onboard_devs(void)
++{
++	int ret = 0;
+ 	/*
+ 	 * Register on-board SPI devices
+ 	 */
+@@ -233,7 +254,6 @@ static int intel_qrk_gpio_restrict_probe(void)
+ 	if (ret) {
+ 		pr_err("%s: Failed to register sc16is752 SPI device\n",
+ 		       __func__);
+-		goto err;
+ 	}
+ 
+ 	spi_sc16is741_info.irq = gpio_to_irq(GPIO_GPIO1_RS485_IRQ);
+@@ -241,59 +261,110 @@ static int intel_qrk_gpio_restrict_probe(void)
+ 	if (ret) {
+ 		pr_err("%s: Failed to register sc16is741 SPI device\n",
+ 		       __func__);
+-		goto err;
+ 	}
+ 
+ 	return 0;
+-err:
+-	gpio_free_array(reserved_gpios, ARRAY_SIZE(reserved_gpios));
+-	return ret;
+ }
+ 
+ /**
+- * intel_qrk_gpio_restrict_probe_nc
++ * intel_quark_restrict_probe
++ *
++ * Register platform devices.
+  *
+  * Make GPIOs pertaining to Firmware inaccessible by requesting them.  The
+  * GPIOs are never released nor accessed by this driver.
++ *
+  */
+-static int intel_qrk_gpio_restrict_probe_nc(struct platform_device *pdev)
++static int intel_quark_restrict_probe(void)
++{
++	int ret;
++
++	/* The intel_quark_i2c_add_onboard_devs() function may return a defered
++	 * probe error message.  In this, case gpio_reserved will be used to
++	 * prevent the driver requesting the GPIO array a second time.
++	 */
++	if (!gpio_reserved) {
++		/*
++		 * Reserve GPIOs for I2C/SPI device interrupts (never released)
++		 */
++		ret = gpio_request_array(reserved_gpios,
++					 ARRAY_SIZE(reserved_gpios));
++		if (ret) {
++			pr_err("%s: failed to reserved gpios\n",
++			       __func__);
++			return ret;
++		}
++		gpio_reserved = 1;
++	}
++
++	/* Register I2C devices */
++	ret = intel_quark_i2c_add_onboard_devs();
++	if (ret)
++		return ret;
++
++	/* Register SPI devices */
++	ret = intel_quark_spi_add_onboard_devs();
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++/**
++ * intel_quark_gpio_restrict_probe_nc
++ *
++ * Ensure that modules gpio-sch and intel-qrk-gip are loaded before continuing
++ */
++static int intel_quark_gpio_restrict_probe_nc(struct platform_device *pdev)
+ {
+ 	int ret;
+ 	nc_gpio_reg = 1;
+ 
+ 	if (nc_gpio_reg == 1 && sc_gpio_reg == 1) {
+-		ret = intel_qrk_gpio_restrict_probe();
++		ret = intel_quark_restrict_probe();
+ 		if (ret)
+ 			return ret;
+ 	}
+ 	return 0;
+ }
+ 
++static int intel_quark_gpio_restrict_remove_nc(struct platform_device *pdev)
++{
++	nc_gpio_reg = 0;
++	return 0;
++}
++
+ /**
+- * intel_qrk_gpio_restrict_probe_sc
++ * intel_quark_gpio_restrict_probe_sc
+  *
+- * Make GPIOs pertaining to Firmware inaccessible by requesting them.  The
+- * GPIOs are never released nor accessed by this driver.
++ * Ensure that modules gpio-sch and intel-qrk-gip are loaded before continuing
+  */
+-static int intel_qrk_gpio_restrict_probe_sc(struct platform_device *pdev)
++static int intel_quark_gpio_restrict_probe_sc(struct platform_device *pdev)
+ {
+ 	int ret;
+ 	sc_gpio_reg = 1;
+ 
+ 	if (nc_gpio_reg == 1 && sc_gpio_reg == 1) {
+-		ret = intel_qrk_gpio_restrict_probe();
++		ret = intel_quark_restrict_probe();
+ 		if (ret)
+ 			return ret;
+ 	}
+ 	return 0;
+ }
+ 
++static int intel_quark_gpio_restrict_remove_sc(struct platform_device *pdev)
++{
++	sc_gpio_reg = 0;
++	return 0;
++}
++
+ static struct platform_driver gpio_restrict_pdriver_nc = {
+ 	.driver		= {
+ 		.name	= GPIO_RESTRICT_NAME_NC,
+ 		.owner	= THIS_MODULE,
+ 	},
+-	.probe		= intel_qrk_gpio_restrict_probe_nc,
++	.probe		= intel_quark_gpio_restrict_probe_nc,
++	.remove		= intel_quark_gpio_restrict_remove_nc,
+ };
+ 
+ static struct platform_driver gpio_restrict_pdriver_sc = {
+@@ -301,76 +372,15 @@ static struct platform_driver gpio_restrict_pdriver_sc = {
+ 		.name	= GPIO_RESTRICT_NAME_SC,
+ 		.owner	= THIS_MODULE,
+ 	},
+-	.probe		= intel_qrk_gpio_restrict_probe_sc,
++	.probe		= intel_quark_gpio_restrict_probe_sc,
++	.remove		= intel_quark_gpio_restrict_remove_sc,
+ };
+ 
+-/**
+- * intel_qrk_i2c_add_onboard_devs
+- *
+- * @return 0 on success or standard errnos on failure
+- *
+- * Registers onboard I2c device(s) present on the Reliance Creek platform
+- */
+-static int intel_qrk_i2c_add_onboard_devs(void)
+-{
+-	int ret = 0;
+-	struct i2c_adapter *i2c_adap = NULL;
+-	struct i2c_client *client = NULL;
+-
+-	i2c_adap = i2c_get_adapter(0);
+-	if (NULL == i2c_adap) {
+-		pr_info("%s: i2c adapter not ready yet. Deferring..\n",
+-			__func__);
+-		return -EPROBE_DEFER;
+-	}
+-
+-	/*
+-	 * Register on-board I2C devices
+-	 */
+-	strlcpy(probed_i2c_tmp75c.type, "tmp75c", I2C_NAME_SIZE);
+-	client = i2c_new_probed_device(i2c_adap, &probed_i2c_tmp75c,
+-				       tmp75c_i2c_addr, i2c_probe);
+-	if (client == NULL) {
+-		pr_err("%s: Failed to probe tmp75c I2C device\n", __func__);
+-		ret = -ENODEV;
+-		goto end;
+-	}
+-	strlcpy(probed_i2c_eeprom.type, "24c64", I2C_NAME_SIZE);
+-	client = i2c_new_probed_device(i2c_adap, &probed_i2c_eeprom,
+-				       eeprom_i2c_addr, i2c_probe);
+-	if (client == NULL) {
+-		pr_err("%s: Failed to probe 24c64 I2C device\n", __func__);
+-		ret = -ENODEV;
+-		goto end;
+-	}
+-	strlcpy(probed_i2c_pcf8574_exp3.type, "pcf8574", I2C_NAME_SIZE);
+-	client = i2c_new_probed_device(i2c_adap, &probed_i2c_pcf8574_exp3,
+-				       pcf8574_exp3_i2c_addr, i2c_probe);
+-	if (client == NULL) {
+-		pr_err("%s: Failed to probe pcf8574 I2C device\n", __func__);
+-		ret = -ENODEV;
+-		goto end;
+-	}
+-
+-end:
+-	i2c_put_adapter(i2c_adap);
+-
+-	return ret;
+-}
+-
+-static int intel_qrk_plat_reliance_creek_probe(struct platform_device *pdev)
++static int
++intel_quark_platform_reliance_creek_probe(struct platform_device *pdev)
+ {
+ 	int ret = 0;
+ 
+-	/* Register on-board I2C devices */
+-	ret = intel_qrk_i2c_add_onboard_devs();
+-	if (ret)
+-		return ret;
+-
+-	/* Note that we register I2C devices first and everything else later
+-	 * because the I2C reg functions may return -EPROBE_DEFER
+-	 * and the following functions are not written to be idempotent
+-	 */
+ 	ret = platform_driver_register(&gpio_restrict_pdriver_nc);
+ 	if (ret)
+ 		return ret;
+@@ -378,23 +388,16 @@ static int intel_qrk_plat_reliance_creek_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Register GPIO VBUS platform device */
+-	ret = platform_device_register(&pch_udc_gpio_vbus_device);
+-	if (ret) {
+-		pr_err("%s: Failed to register pch_udc_gpio_vbus_device!\n",
+-				__func__);
+-		return ret;
+-	}
+-
+ 	return 0;
+ }
+ 
+-static int intel_qrk_plat_reliance_creek_remove(struct platform_device *pdev)
++static int
++intel_quark_platform_reliance_creek_remove(struct platform_device *pdev)
+ {
+ 	return 0;
+ }
+ 
+-static struct platform_device_id intel_qrk_reliance_creek_ids[] = {
++static struct platform_device_id intel_quark_platform_reliance_creek_ids[] = {
+ 	{
+ 		.name = "RelianceCreek",
+ 		.driver_data = 0,
+@@ -404,21 +407,21 @@ static struct platform_device_id intel_qrk_reliance_creek_ids[] = {
+ 		.driver_data = 1,
+ 	},
+ };
+-MODULE_DEVICE_TABLE(platform, intel_qrk_reliance_creek_ids);
++MODULE_DEVICE_TABLE(platform, intel_quark_platform_reliance_creek_ids);
+ 
+-static struct platform_driver intel_qrk_reliance_creek_driver = {
++static struct platform_driver intel_quark_platform_reliance_creek_driver = {
+ 	.driver		= {
+ 		.name	= DRIVER_NAME,
+ 		.owner	= THIS_MODULE,
+ 	},
+-	.probe		= intel_qrk_plat_reliance_creek_probe,
+-	.remove		= intel_qrk_plat_reliance_creek_remove,
+-	.id_table	= intel_qrk_reliance_creek_ids,
++	.probe		= intel_quark_platform_reliance_creek_probe,
++	.remove		= intel_quark_platform_reliance_creek_remove,
++	.id_table	= intel_quark_platform_reliance_creek_ids,
+ };
+ 
+-module_platform_driver(intel_qrk_reliance_creek_driver);
++module_platform_driver(intel_quark_platform_reliance_creek_driver);
+ 
+-MODULE_AUTHOR("Dan O'Donovan <dan@emutex.com>");
++MODULE_AUTHOR("Intel Corporation");
+ MODULE_DESCRIPTION("Reliance Creek BSP Data");
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+-- 
+1.9.3
+

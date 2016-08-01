@@ -1,0 +1,29 @@
+From 18f1edac2db7fe61f732ea80ed97bbf98441b012 Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Tue, 24 Nov 2015 12:13:29 +0000
+Subject: [PATCH 370/389] Reliance Creek: multiple definition of
+ `slb9645tt_platform_data'
+
+RTC# 125957
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/platform/x86/intel-quark/intel_qrk_plat_reliance_creek.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_qrk_plat_reliance_creek.c b/drivers/platform/x86/intel-quark/intel_qrk_plat_reliance_creek.c
+index da0d3b5..481fdf1 100755
+--- a/drivers/platform/x86/intel-quark/intel_qrk_plat_reliance_creek.c
++++ b/drivers/platform/x86/intel-quark/intel_qrk_plat_reliance_creek.c
+@@ -78,7 +78,7 @@ static struct pcf857x_platform_data pcf8574_platform_data_exp3 = {
+ 	.gpio_base = PCF8574_GPIO_BASE_OFFSET + 16,
+ };
+ 
+-struct tpm_i2c_infenion_platform_data slb9645tt_platform_data = {
++static struct tpm_i2c_infenion_platform_data slb9645tt_platform_data = {
+ 	.gpio_reset = GPIO_SLB9645TT_RESET,
+ 	.gpio_irq = GPIO_SLB9645TT_INT,
+ };
+-- 
+1.9.3
+

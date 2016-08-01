@@ -1,0 +1,119 @@
+From 2a7e0a82f56f7a86cd560cd6b78aab6c7c328e9e Mon Sep 17 00:00:00 2001
+From: "vasudevan,krishna prasath" <krishna.prasathx.k.vasudevan@intel.com>
+Date: Thu, 6 Aug 2015 17:09:58 +0700
+Subject: [PATCH 359/389] m25p80:Removing the m25p80 boardfile entry for
+ galileo gen1 & gen2 (RTC#116413)
+
+The flash mtd partitions are not exposed to the kernel by BIOS,eventhough m25p80
+entries are present in the board file it serves no purpose,hence the m25p80
+entries are commented out to disable it,it can be enabled once BIOS is updated
+to support mtd partitions.
+
+Signed-off-by: vasudevan,krishna prasath <krishna.prasathx.k.vasudevan@intel.com>
+Change-Id: Ib6f98be62be450e2eaa2ce096c8c36d708a94f9f
+Reviewed-on: https://git-gar-1.devtools.intel.com/gerrit/6008
+Reviewed-by: Fung, Joshua <joshua.fung@intel.com>
+Tested-by: Fung, Joshua <joshua.fung@intel.com>
+---
+ .../x86/intel-quark/intel_quark_platform_galileo.c   | 20 +++++++++++++++++++-
+ .../intel-quark/intel_quark_platform_galileo_gen2.c  | 18 +++++++++++++++++-
+ 2 files changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+index aae125e..bb1cb60 100644
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+@@ -165,7 +165,14 @@ static struct pxa2xx_spi_chip qrk_ffrd_spi_1_cs_0 = {
+ 
+ #define LPC_SCH_SPI_BUS_ID 0x03
+ 
+-/* TODO: extract this data from layout.conf encoded in flash */
++/**
++ * Eventhough the board file has the entry for m25p80,
++ * the mtd partitions are not exposed by BIOS to the kernel,
++ * hence removing the entry in the board file ,May be useful
++ * in future if BIOS provides the mtd partitions to the kernel
++ */
++
++#if 0
+ struct mtd_partition ilb_partitions[] = {
+ 	{
+ 		.name		= "grub",
+@@ -195,19 +202,30 @@ struct mtd_partition ilb_partitions[] = {
+ 	},
+ };
+ 
++
++
+ static struct flash_platform_data ilb_flash = {
+ 	.type = "s25fl064k",
+ 	.parts = ilb_partitions,
+ 	.nr_parts = ARRAY_SIZE(ilb_partitions),
+ };
++#endif
+ 
+ static struct spi_board_info spi_onboard_devs[] = {
++
++/**
++ * Eventhough the board file has the entry for m25p80,
++ * the mtd partitions are not exposed by BIOS to the kernel,
++ * hence disabling the entry in the board file
++ */
++#if 0
+ 	{
+ 		.modalias = "m25p80",
+ 		.platform_data = &ilb_flash,
+ 		.bus_num = LPC_SCH_SPI_BUS_ID,
+ 		.chip_select = 0,
+ 	},
++#endif
+ 	{
+ 		.modalias = "ad7298",
+ 		.max_speed_hz = 5000000,
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
+index f5ac542..7b9a82d 100644
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
+@@ -156,7 +156,15 @@ static struct pxa2xx_spi_chip qrk_ffrd_spi_1_cs_0 = {
+ 
+ #define LPC_SCH_SPI_BUS_ID 0x03
+ 
+-/* TODO: extract this data from layout.conf encoded in flash */
++/**
++ * Eventhough the board file has the entry for m25p80,
++ * the mtd partitions are not exposed by BIOS to the kernel,
++ * hence removing the entry in the board file ,May be useful
++ * in future if BIOS provides the mtd partitions to the kernel
++ */
++
++#if 0
++
+ struct mtd_partition galileo_gen2_ilb_partitions[] = {
+ 	{
+ 		.name		= "grub",
+@@ -191,14 +199,22 @@ static struct flash_platform_data ilb_flash = {
+ 	.parts = galileo_gen2_ilb_partitions,
+ 	.nr_parts = ARRAY_SIZE(galileo_gen2_ilb_partitions),
+ };
++#endif
+ 
+ static struct spi_board_info spi0_onboard_devs_gen2[] = {
++/**
++ * Eventhough the board file has the entry for m25p80,
++ * the mtd partitions are not exposed by BIOS to the kernel,
++ * hence disabling the entry in the board file
++ */
++#if 0
+ 	{
+ 		.modalias = "m25p80",
+ 		.platform_data = &ilb_flash,
+ 		.bus_num = LPC_SCH_SPI_BUS_ID,
+ 		.chip_select = 0,
+ 	},
++#endif
+ 	{
+ 		.modalias = "adc1x8s102",
+ 		.max_speed_hz = 16667000,
+-- 
+1.9.3
+

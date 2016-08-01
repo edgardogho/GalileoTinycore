@@ -1,0 +1,47 @@
+From 5a549858f3a2780293685f6a4686c3e227881b30 Mon Sep 17 00:00:00 2001
+From: Giuseppe CAVALLARO <peppe.cavallaro@st.com>
+Date: Tue, 14 Oct 2014 08:12:55 +0200
+Subject: [PATCH 171/389] stmmac: make the STi Layer compatible to STiH407
+
+This adds the missing compatibility to the STiH407 SoC.
+
+Signed-off-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 160e1fd10a287bb805745ea4e5b8bb383b686b7f)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ Documentation/devicetree/bindings/net/sti-dwmac.txt   | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/sti-dwmac.txt b/Documentation/devicetree/bindings/net/sti-dwmac.txt
+index 3dd3d0b..8c84d9a 100644
+--- a/Documentation/devicetree/bindings/net/sti-dwmac.txt
++++ b/Documentation/devicetree/bindings/net/sti-dwmac.txt
+@@ -3,8 +3,8 @@ STMicroelectronics SoC DWMAC glue layer controller
+ The device node has following properties.
+ 
+ Required properties:
+- - compatible	: Can be "st,stih415-dwmac", "st,stih416-dwmac" or
+-   "st,stid127-dwmac".
++ - compatible	: Can be "st,stih415-dwmac", "st,stih416-dwmac",
++   "st,stid127-dwmac", "st,stih407-dwmac".
+  - reg		: Offset of the glue configuration register map in system
+    configuration regmap pointed by st,syscon property and size.
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 4894500..0d6b9ad 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -40,6 +40,7 @@ static const struct of_device_id stmmac_dt_ids[] = {
+ 	{ .compatible = "st,stih415-dwmac", .data = &sti_gmac_data},
+ 	{ .compatible = "st,stih416-dwmac", .data = &sti_gmac_data},
+ 	{ .compatible = "st,stid127-dwmac", .data = &sti_gmac_data},
++	{ .compatible = "st,stih407-dwmac", .data = &sti_gmac_data},
+ #endif
+ #ifdef CONFIG_DWMAC_SOCFPGA
+ 	{ .compatible = "altr,socfpga-stmmac", .data = &socfpga_gmac_data },
+-- 
+1.9.3
+

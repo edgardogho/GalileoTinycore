@@ -1,0 +1,47 @@
+From 3c4a6feafb891007cfe8ffff8240431c9a8dd543 Mon Sep 17 00:00:00 2001
+From: Sonic Zhang <sonic.zhang@analog.com>
+Date: Thu, 22 Jan 2015 14:55:58 +0800
+Subject: [PATCH 205/389] stmmac: Add an optional device tree property
+ "snps,burst_len"
+
+This property define the AXI bug lenth.
+
+Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit fa067467d84b9ebf6886383fe79715f3df90f255)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ Documentation/devicetree/bindings/net/stmmac.txt      | 1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/stmmac.txt b/Documentation/devicetree/bindings/net/stmmac.txt
+index ae5d80e..7ac7c30 100644
+--- a/Documentation/devicetree/bindings/net/stmmac.txt
++++ b/Documentation/devicetree/bindings/net/stmmac.txt
+@@ -46,6 +46,7 @@ Optional properties:
+   available this clock is used for programming the Timestamp Addend Register.
+   If not passed then the system clock will be used and this is fine on some
+   platforms.
++- snps,burst_len: The AXI burst lenth value of the AXI BUS MODE register.
+ 
+ Examples:
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 879e29f..fb846eb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -235,6 +235,9 @@ static int stmmac_probe_config_dt(struct platform_device *pdev,
+ 			of_property_read_bool(np, "snps,fixed-burst");
+ 		dma_cfg->mixed_burst =
+ 			of_property_read_bool(np, "snps,mixed-burst");
++		of_property_read_u32(np, "snps,burst_len", &dma_cfg->burst_len);
++		if (dma_cfg->burst_len < 0 || dma_cfg->burst_len > 256)
++			dma_cfg->burst_len = 0;
+ 	}
+ 	plat->force_thresh_dma_mode = of_property_read_bool(np, "snps,force_thresh_dma_mode");
+ 	if (plat->force_thresh_dma_mode) {
+-- 
+1.9.3
+

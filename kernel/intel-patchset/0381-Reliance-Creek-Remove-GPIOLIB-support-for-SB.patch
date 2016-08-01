@@ -1,0 +1,148 @@
+From 56816cfa4697ee98ccfea12c4d38ddfa967283ae Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Mon, 7 Dec 2015 14:56:17 +0000
+Subject: [PATCH 381/389] Reliance Creek: Remove GPIOLIB support for SB
+
+Remove support for the PCF8574 I2C to gpio expanders
+on the Reliance Creek sensor board.
+
+RTC # 126866
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ .../intel_quark_platform_reliance_creek.c          | 81 +---------------------
+ 1 file changed, 2 insertions(+), 79 deletions(-)
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+old mode 100644
+new mode 100755
+index 481fdf1..84b15ea
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+@@ -66,16 +66,8 @@ static int sc_gpio_reg;
+ #include "linux/platform_data/pca953x.h"
+ #define PCF8574_GPIO_BASE_OFFSET 16
+ 
+-static struct pcf857x_platform_data pcf8574_platform_data_exp1 = {
+-	.gpio_base = PCF8574_GPIO_BASE_OFFSET,
+-};
+-
+-static struct pcf857x_platform_data pcf8574_platform_data_exp2 = {
+-	.gpio_base = PCF8574_GPIO_BASE_OFFSET + 8,
+-};
+-
+ static struct pcf857x_platform_data pcf8574_platform_data_exp3 = {
+-	.gpio_base = PCF8574_GPIO_BASE_OFFSET + 16,
++	.gpio_base = PCF8574_GPIO_BASE_OFFSET,
+ };
+ 
+ static struct tpm_i2c_infenion_platform_data slb9645tt_platform_data = {
+@@ -88,19 +80,11 @@ static struct tpm_i2c_infenion_platform_data slb9645tt_platform_data = {
+  ******************************************************************************/
+ #define TMP75C_ADDR				0x48
+ #define EEPROM_ADDR				0x50
+-#define PCF8574_EXP1_ADDR			0x23
+-#define PCF8574_EXP2_ADDR			0x21
+ #define PCF8574_EXP3_ADDR			0x22
+ #define SLB9645TT_ADDR				0x20
+ 
+ static struct i2c_board_info probed_i2c_tmp75c;
+ static struct i2c_board_info probed_i2c_eeprom;
+-static struct i2c_board_info probed_i2c_pcf8574_exp1 = {
+-	.platform_data = &pcf8574_platform_data_exp1,
+-};
+-static struct i2c_board_info probed_i2c_pcf8574_exp2 = {
+-	.platform_data = &pcf8574_platform_data_exp2,
+-};
+ static struct i2c_board_info probed_i2c_pcf8574_exp3 = {
+ 	.platform_data = &pcf8574_platform_data_exp3,
+ };
+@@ -114,12 +98,6 @@ static const unsigned short tmp75c_i2c_addr[] = {
+ static const unsigned short eeprom_i2c_addr[] = {
+ 	EEPROM_ADDR, I2C_CLIENT_END
+ };
+-static const unsigned short pcf8574_exp1_i2c_addr[] = {
+-	PCF8574_EXP1_ADDR, I2C_CLIENT_END
+-};
+-static const unsigned short pcf8574_exp2_i2c_addr[] = {
+-	PCF8574_EXP2_ADDR, I2C_CLIENT_END
+-};
+ static const unsigned short pcf8574_exp3_i2c_addr[] = {
+ 	PCF8574_EXP3_ADDR, I2C_CLIENT_END
+ };
+@@ -380,70 +358,15 @@ end:
+ 	return ret;
+ }
+ 
+-/**
+- * intel_qrk_i2c_add_onboard_devs
+- *
+- * @return 0 on success or standard errnos on failure
+- *
+- * Registers I2c device(s) present on the Reliance Creek Sensor Interface Board
+- */
+-static int intel_qrk_i2c_add_sib_devs(void)
+-{
+-	int ret = 0;
+-	struct i2c_adapter *i2c_adap = NULL;
+-	struct i2c_client *client = NULL;
+-
+-	i2c_adap = i2c_get_adapter(0);
+-	if (NULL == i2c_adap) {
+-		pr_info("%s: i2c adapter not ready yet. Deferring..\n",
+-			__func__);
+-		return -EPROBE_DEFER;
+-	}
+-
+-	/*
+-	 * Register I2C devices on the Sensor Interface Board
+-	 */
+-	strlcpy(probed_i2c_pcf8574_exp1.type, "pcf8574", I2C_NAME_SIZE);
+-	client = i2c_new_probed_device(i2c_adap, &probed_i2c_pcf8574_exp1,
+-				       pcf8574_exp1_i2c_addr, i2c_probe);
+-	if (client == NULL) {
+-		pr_err("%s: Failed to probe pcf8574 I2C device\n", __func__);
+-		ret = -ENODEV;
+-		goto end;
+-	}
+-	strlcpy(probed_i2c_pcf8574_exp2.type, "pcf8574", I2C_NAME_SIZE);
+-	client = i2c_new_probed_device(i2c_adap, &probed_i2c_pcf8574_exp2,
+-				       pcf8574_exp2_i2c_addr, i2c_probe);
+-	if (client == NULL) {
+-		pr_err("%s: Failed to probe pcf8574 I2C device\n", __func__);
+-		ret = -ENODEV;
+-		goto end;
+-	}
+-
+-end:
+-	i2c_put_adapter(i2c_adap);
+-
+-	return ret;
+-}
+-
+ static int intel_qrk_plat_reliance_creek_probe(struct platform_device *pdev)
+ {
+ 	int ret = 0;
+ 
+-	/* Register on-board I2C devices (common to all SKUs) */
++	/* Register on-board I2C devices */
+ 	ret = intel_qrk_i2c_add_onboard_devs();
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Register I2C devices on Sensor Interface Board
+-	 * Applicable to Reliance Creek SPU board only
+-	 */
+-	if (pdev->id_entry && pdev->id_entry->driver_data) {
+-		ret = intel_qrk_i2c_add_sib_devs();
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	/* Note that we register I2C devices first and everything else later
+ 	 * because the I2C reg functions may return -EPROBE_DEFER
+ 	 * and the following functions are not written to be idempotent
+-- 
+1.9.3
+

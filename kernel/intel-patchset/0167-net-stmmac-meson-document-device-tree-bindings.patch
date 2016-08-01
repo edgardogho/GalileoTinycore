@@ -1,0 +1,52 @@
+From a43833de9b26bb42917f8c99dab29e740e5f823f Mon Sep 17 00:00:00 2001
+From: Beniamino Galvani <b.galvani@gmail.com>
+Date: Sat, 20 Sep 2014 15:29:17 +0200
+Subject: [PATCH 167/389] net: stmmac: meson: document device tree bindings
+
+Add the device tree bindings documentation for the Amlogic Meson
+variant of the Synopsys DesignWare MAC.
+
+Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 318fd4909dcb7dc43a869132c2f38b769ed92d6a)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ .../devicetree/bindings/net/meson-dwmac.txt        | 25 ++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/meson-dwmac.txt
+
+diff --git a/Documentation/devicetree/bindings/net/meson-dwmac.txt b/Documentation/devicetree/bindings/net/meson-dwmac.txt
+new file mode 100644
+index 0000000..ec633d7
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/meson-dwmac.txt
+@@ -0,0 +1,25 @@
++* Amlogic Meson DWMAC Ethernet controller
++
++The device inherits all the properties of the dwmac/stmmac devices
++described in the file net/stmmac.txt with the following changes.
++
++Required properties:
++
++- compatible: should be "amlogic,meson6-dwmac" along with "snps,dwmac"
++	      and any applicable more detailed version number
++	      described in net/stmmac.txt
++
++- reg: should contain a register range for the dwmac controller and
++       another one for the Amlogic specific configuration
++
++Example:
++
++	ethmac: ethernet@c9410000 {
++		compatible = "amlogic,meson6-dwmac", "snps,dwmac";
++		reg = <0xc9410000 0x10000
++		       0xc1108108 0x4>;
++		interrupts = <0 8 1>;
++		interrupt-names = "macirq";
++		clocks = <&clk81>;
++		clock-names = "stmmaceth";
++	}
+-- 
+1.9.3
+

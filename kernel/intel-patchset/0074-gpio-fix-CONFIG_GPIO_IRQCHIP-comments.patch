@@ -1,0 +1,45 @@
+From 27db6240578337486ff371cc8ee37f4fc9393c8e Mon Sep 17 00:00:00 2001
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 5 Sep 2014 13:09:25 +0200
+Subject: [PATCH 074/389] gpio: fix 'CONFIG_GPIO_IRQCHIP' comments
+
+These two typos were introduced in commit 1425052097b5 ("gpio: add IRQ
+chip helpers in gpiolib").
+
+The correct symbol name is CONFIG_GPIOLIB_IRQCHIP.
+
+[jkosina@suse.cz: add changelog]
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+(cherry picked from commit 7d75a871888e3f5e1a7c99bf240d1cd67d8bdfa0)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ include/linux/gpio/driver.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/gpio/driver.h b/include/linux/gpio/driver.h
+index 498e867..8569b43 100644
+--- a/include/linux/gpio/driver.h
++++ b/include/linux/gpio/driver.h
+@@ -105,7 +105,7 @@ struct gpio_chip {
+ 
+ #ifdef CONFIG_GPIOLIB_IRQCHIP
+ 	/*
+-	 * With CONFIG_GPIO_IRQCHIP we get an irqchip inside the gpiolib
++	 * With CONFIG_GPIOLIB_IRQCHIP we get an irqchip inside the gpiolib
+ 	 * to handle IRQs for most practical cases.
+ 	 */
+ 	struct irq_chip		*irqchip;
+@@ -164,7 +164,7 @@ int gpiochip_irqchip_add(struct gpio_chip *gpiochip,
+ 		irq_flow_handler_t handler,
+ 		unsigned int type);
+ 
+-#endif /* CONFIG_GPIO_IRQCHIP */
++#endif /* CONFIG_GPIOLIB_IRQCHIP */
+ 
+ struct gpio_desc *gpiochip_request_own_desc(struct gpio_chip *chip, u16 hwnum,
+ 					    const char *label);
+-- 
+1.9.3
+

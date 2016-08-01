@@ -1,0 +1,51 @@
+From 75cba004073fed7c38be3d7d07c5ebaca2fb72d1 Mon Sep 17 00:00:00 2001
+From: Felipe Balbi <balbi@ti.com>
+Date: Mon, 28 Sep 2015 15:45:47 +0000
+Subject: [PATCH 372/389] usb: gadget: pch-udc: fix lock
+
+gadget methods should be called without
+spinlocks held.
+
+Reported-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
+Signed-off-by: Felipe Balbi <balbi@ti.com>
+(cherry picked from kernel commit 9903b6bedd389a033a3da0308f220571c7f68e7a)
+
+Conflicts:
+	drivers/usb/gadget/pch_udc.c
+	drivers/usb/gadget/udc/pch_udc.c
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/usb/gadget/pch_udc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/usb/gadget/pch_udc.c b/drivers/usb/gadget/pch_udc.c
+index 3fa7bdc..842bac0 100755
+--- a/drivers/usb/gadget/pch_udc.c
++++ b/drivers/usb/gadget/pch_udc.c
+@@ -2832,18 +2832,18 @@ static void pch_udc_dev_isr(struct pch_udc_dev *dev, u32 dev_intr)
+ 	if (dev_intr & UDC_DEVINT_US) {
+ 		if (dev->driver
+ 			&& dev->driver->suspend) {
+-			spin_lock(&dev->lock);
+-			dev->driver->suspend(&dev->gadget);
+ 			spin_unlock(&dev->lock);
++			dev->driver->suspend(&dev->gadget);
++			spin_lock(&dev->lock);
+ 		}
+ 
+ 		vbus = pch_vbus_gpio_get_value(dev);
+ 		if ((dev->vbus_session == 0)
+ 			&& (vbus != 1)) {
+ 			if (dev->driver && dev->driver->disconnect) {
+-				spin_lock(&dev->lock);
+-				dev->driver->disconnect(&dev->gadget);
+ 				spin_unlock(&dev->lock);
++				dev->driver->disconnect(&dev->gadget);
++				spin_lock(&dev->lock);
+ 			}
+ 			pch_udc_reconnect(dev);
+ 		} else if ((dev->vbus_session == 0)
+-- 
+1.9.3
+

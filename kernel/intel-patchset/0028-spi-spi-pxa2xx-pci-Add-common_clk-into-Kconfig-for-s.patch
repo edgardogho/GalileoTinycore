@@ -1,0 +1,28 @@
+From 385373c954d68d7adb6e40672ece15b529b2250b Mon Sep 17 00:00:00 2001
+From: "Arumugam,Kamenee" <kamenee.arumugam@intel.com>
+Date: Mon, 9 Mar 2015 11:31:29 +0800
+Subject: [PATCH 028/389] spi: spi-pxa2xx-pci: Add common_clk into Kconfig for
+ spi-pxa2xx-pci
+
+This patch is enable common_clk kconfig for the spi-pxa2xx-pci
+
+Signed-off-by: Arumugam,Kamenee <kamenee.arumugam@intel.com>
+---
+ arch/x86/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index a00101e..fcf9ad0 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -474,6 +474,7 @@ config X86_INTEL_QUARK
+ 	depends on X86_IO_APIC
+ 	select IOSF_MBI
+ 	select INTEL_IMR
++	select COMMON_CLK
+ 	---help---
+ 	  Select to include support for Quark X1000 SoC.
+ 	  Say Y here if you have a Quark based system such as the Arduino
+-- 
+1.9.3
+

@@ -1,0 +1,38 @@
+From 1f99751934539da8610e77d158f91b21617677bc Mon Sep 17 00:00:00 2001
+From: Ley Foon Tan <lftan@altera.com>
+Date: Thu, 28 Aug 2014 12:59:46 +0800
+Subject: [PATCH 157/389] net: stmmac: fix warning from Sparse for socfpga
+
+Warning:
+drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:122:41:
+sparse: cast removes address space of expression
+drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:122:38:
+sparse: incorrect type in assignment (different address spaces)
+
+Signed-off-by: Ley Foon Tan <lftan@altera.com>
+Acked-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit dace1b54726bffe1c009f7661e3cee6b762f30c8)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index cd613d7..ddc6115 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -119,8 +119,7 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 			return -EINVAL;
+ 		}
+ 
+-		dwmac->splitter_base = (void *)devm_ioremap_resource(dev,
+-			&res_splitter);
++		dwmac->splitter_base = devm_ioremap_resource(dev, &res_splitter);
+ 		if (!dwmac->splitter_base) {
+ 			dev_info(dev, "Failed to mapping emac splitter\n");
+ 			return -EINVAL;
+-- 
+1.9.3
+

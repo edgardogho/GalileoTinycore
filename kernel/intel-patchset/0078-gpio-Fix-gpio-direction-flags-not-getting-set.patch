@@ -1,0 +1,35 @@
+From 39261f34ec59fff3e4e8dec4251672c3e0495bd0 Mon Sep 17 00:00:00 2001
+From: Adrian Hunter <adrian.hunter@intel.com>
+Date: Mon, 22 Sep 2014 11:01:16 +0300
+Subject: [PATCH 078/389] gpio: Fix gpio direction flags not getting set
+
+GPIO direction flags are not getting set because
+an 'if' statement is the wrong way around.
+
+Cc: Stable <stable@vger.kernel.org> # 3.15+
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Acked-by: Alexandre Courbot <acourbot@nvidia.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+(cherry picked from commit 72f908c88cef42b4ad486c39967fa4d7fdffce18)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ drivers/gpio/gpiolib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index 4acf8b2..a2690f8 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -1674,7 +1674,7 @@ struct gpio_desc *__must_check __gpiod_get_index(struct device *dev,
+ 		set_bit(FLAG_OPEN_SOURCE, &desc->flags);
+ 
+ 	/* No particular flag request, return here... */
+-	if (flags & GPIOD_FLAGS_BIT_DIR_SET)
++	if (!(flags & GPIOD_FLAGS_BIT_DIR_SET))
+ 		return desc;
+ 
+ 	/* Process flags */
+-- 
+1.9.3
+

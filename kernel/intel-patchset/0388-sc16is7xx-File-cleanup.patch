@@ -1,0 +1,131 @@
+From 1506b33478d73cc4b3b96756a8a3e757b26dfd02 Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Sun, 13 Dec 2015 00:29:16 +0000
+Subject: [PATCH 388/389] sc16is7xx: File cleanup
+
+Removed compiler warning on tty_flip_buffer_push() parameters
+Updated license infomation
+Minor file cleanup
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/tty/serial/sc16is7xx-i2c.c | 3 ++-
+ drivers/tty/serial/sc16is7xx-spi.c | 5 ++++-
+ drivers/tty/serial/sc16is7xx.c     | 4 ++--
+ drivers/tty/serial/sc16is7xx.h     | 3 +--
+ 4 files changed, 9 insertions(+), 6 deletions(-)
+ mode change 100644 => 100755 drivers/tty/serial/sc16is7xx-i2c.c
+ mode change 100644 => 100755 drivers/tty/serial/sc16is7xx-spi.c
+ mode change 100644 => 100755 drivers/tty/serial/sc16is7xx.c
+ mode change 100644 => 100755 drivers/tty/serial/sc16is7xx.h
+
+diff --git a/drivers/tty/serial/sc16is7xx-i2c.c b/drivers/tty/serial/sc16is7xx-i2c.c
+old mode 100644
+new mode 100755
+index 087ce2a..c295c1a
+--- a/drivers/tty/serial/sc16is7xx-i2c.c
++++ b/drivers/tty/serial/sc16is7xx-i2c.c
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2014 GridPoint
+  * Author: Jon Ringle <jringle@gridpoint.com>
++ * Copyright (C) 2015 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -82,6 +83,6 @@ module_i2c_driver(sc16is7xx_i2c_uart_driver);
+ 
+ MODULE_ALIAS("i2c:sc16is7xx");
+ 
+-MODULE_AUTHOR("Nicolás Pernas Maradei <nicolas.pernas.maradei@emutex.com>");
++MODULE_AUTHOR("Intel Corporation");
+ MODULE_DESCRIPTION("SC16IS7XX tty serial driver over I2C bus");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/tty/serial/sc16is7xx-spi.c b/drivers/tty/serial/sc16is7xx-spi.c
+old mode 100644
+new mode 100755
+index 800fd885..4b0fc82
+--- a/drivers/tty/serial/sc16is7xx-spi.c
++++ b/drivers/tty/serial/sc16is7xx-spi.c
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2014 GridPoint
+  * Author: Jon Ringle <jringle@gridpoint.com>
++ * Copyright (C) 2015 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -79,6 +80,8 @@ static struct spi_driver sc16is7xx_spi_driver = {
+ };
+ module_spi_driver(sc16is7xx_spi_driver);
+ 
+-MODULE_AUTHOR("Bogdan Pricop <bogdan.pricop@emutex.com>");
++MODULE_ALIAS("spi:sc16is7xx");
++
++MODULE_AUTHOR("Intel Corporation");
+ MODULE_DESCRIPTION("SC16IS7XX tty serial driver over SPI bus");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/tty/serial/sc16is7xx.c b/drivers/tty/serial/sc16is7xx.c
+old mode 100644
+new mode 100755
+index a450851..3f49fed
+--- a/drivers/tty/serial/sc16is7xx.c
++++ b/drivers/tty/serial/sc16is7xx.c
+@@ -1,6 +1,7 @@
+ /*
+  * SC16IS7xx tty serial driver - Copyright (C) 2014 GridPoint
+  * Author: Jon Ringle <jringle@gridpoint.com>
++ * Copyright (C) 2015 Intel Corporation.
+  *
+  *  Based on max310x.c, by Alexander Shiyan <shc_work@mail.ru>
+  *
+@@ -28,7 +29,6 @@
+ 
+ #include "sc16is7xx.h"
+ 
+-
+ /* SC16IS7XX register definitions */
+ #define SC16IS7XX_RHR_REG		(0x00) /* RX FIFO */
+ #define SC16IS7XX_THR_REG		(0x00) /* TX FIFO */
+@@ -537,7 +537,7 @@ static void sc16is7xx_handle_rx(struct uart_port *port, unsigned int rxlen,
+ 		}
+ 	}
+ 
+-	tty_flip_buffer_push(port->state->port.tty);
++	tty_flip_buffer_push(&port->state->port);
+ }
+ 
+ static void sc16is7xx_handle_tx(struct uart_port *port)
+diff --git a/drivers/tty/serial/sc16is7xx.h b/drivers/tty/serial/sc16is7xx.h
+old mode 100644
+new mode 100755
+index 1f113df..a066e09
+--- a/drivers/tty/serial/sc16is7xx.h
++++ b/drivers/tty/serial/sc16is7xx.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2014 GridPoint
+  * Author: Jon Ringle <jringle@gridpoint.com>
++ * Copyright (C) 2015 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -13,7 +14,6 @@
+ #ifndef _SC16IS7XX_H_
+ #define _SC16IS7XX_H_
+ 
+-
+ /* Misc definition used in core module (sc16is7xx.c) and in I2C/SPI bus
+  * specific modules */
+ #define SC16IS7XX_NAME			"sc16is7xx"
+@@ -25,7 +25,6 @@ struct sc16is7xx_devtype {
+ 	int	nr_uart;
+ };
+ 
+-
+ static struct sc16is7xx_devtype sc16is74x_devtype = {
+ 	.name		= "SC16IS74X",
+ 	.nr_gpio	= 0,
+-- 
+1.9.3
+

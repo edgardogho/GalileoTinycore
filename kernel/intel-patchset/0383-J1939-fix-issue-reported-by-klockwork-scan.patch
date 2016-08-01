@@ -1,0 +1,27 @@
+From 80f5078286ff91b5ce82cf7e8bec53aa05481c54 Mon Sep 17 00:00:00 2001
+From: Kai Ji <kai.ji@intel.com>
+Date: Fri, 4 Dec 2015 16:06:12 +0000
+Subject: [PATCH 383/389] J1939: fix issue reported by klockwork scan
+
+KlockWork ID:206537
+
+Signed-off-by: Kai Ji <kai.ji@intel.com>
+---
+ net/can/j1939/proc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/can/j1939/proc.c b/net/can/j1939/proc.c
+index 5ea4002..6170e0e 100644
+--- a/net/can/j1939/proc.c
++++ b/net/can/j1939/proc.c
+@@ -49,6 +49,7 @@ proc_file_write(struct file *file, const char __user *buffer,
+ 	/* FIXME: does this routine need ppos?  probably... */
+ 	return dp->write_proc(file, buffer, count, dp->data);
+ #endif
++	return 0;
+ }
+ 
+ static const struct file_operations j1939_proc_ops = {
+-- 
+1.9.3
+

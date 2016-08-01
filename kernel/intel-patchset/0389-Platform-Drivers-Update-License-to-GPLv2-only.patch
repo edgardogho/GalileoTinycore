@@ -1,0 +1,273 @@
+From 96f99365afffeef169aae89b00a8c41b5d96a0ec Mon Sep 17 00:00:00 2001
+From: William Rafferty <william.a.rafferty@intel.com>
+Date: Thu, 28 Jan 2016 10:19:06 +0000
+Subject: [PATCH 389/389] Platform Drivers - Update License to GPLv2 only
+
+Update the license type from Dual BSD/GPL to GPLv2
+to match IP plan
+
+Signed-off-by: William Rafferty <william.a.rafferty@intel.com>
+---
+ drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c               | 4 ++--
+ drivers/platform/x86/intel-quark/intel_qrk_j1708.c                    | 4 ++--
+ drivers/platform/x86/intel-quark/intel_qrk_smep_test.c                | 4 ++--
+ drivers/platform/x86/intel-quark/intel_qrk_thermal.c                  | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_board_data.c             | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c  | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c  | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c    | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c       | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c  | 4 ++--
+ drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c      | 4 ++--
+ .../platform/x86/intel-quark/intel_quark_platform_reliance_creek.c    | 4 ++--
+ 12 files changed, 24 insertions(+), 24 deletions(-)
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_qrk_j1708.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_qrk_smep_test.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_qrk_thermal.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_board_data.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
+ mode change 100644 => 100755 drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c
+
+diff --git a/drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c b/drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c
+old mode 100644
+new mode 100755
+index dab5a29..59fb4dd
+--- a/drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c
++++ b/drivers/platform/x86/intel-quark/intel_qrk_audio_ctrl.c
+@@ -1,7 +1,7 @@
+ /*
+  * Intel Quark platform audio control driver
+  *
+- * Copyright(c) 2013-2015 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -504,4 +504,4 @@ module_i2c_driver(intel_qrk_audio_ctrl_i2c_driver);
+ 
+ MODULE_AUTHOR("Dan O'Donovan <dan@emutex.com>");
+ MODULE_DESCRIPTION("Intel Quark platform audio control driver");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/platform/x86/intel-quark/intel_qrk_j1708.c b/drivers/platform/x86/intel-quark/intel_qrk_j1708.c
+old mode 100644
+new mode 100755
+index 2f0a002..22a40cc
+--- a/drivers/platform/x86/intel-quark/intel_qrk_j1708.c
++++ b/drivers/platform/x86/intel-quark/intel_qrk_j1708.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -866,4 +866,4 @@ module_exit(quark_j1708_module_exit);
+ 
+ MODULE_DESCRIPTION("Intel Quark Platform J1708 Driver");
+ MODULE_AUTHOR("Wei Lin<wei.w.lin@intel.com>, Xin Zhang<xin.x.zhang@intel.com>");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/platform/x86/intel-quark/intel_qrk_smep_test.c b/drivers/platform/x86/intel-quark/intel_qrk_smep_test.c
+old mode 100644
+new mode 100755
+index fbe762f..dcea349
+--- a/drivers/platform/x86/intel-quark/intel_qrk_smep_test.c
++++ b/drivers/platform/x86/intel-quark/intel_qrk_smep_test.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -277,7 +277,7 @@ static void __exit intel_qrk_smep_test_exit(void)
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@linux.intel.com>");
+ MODULE_DESCRIPTION("Intel Quark SMEP test");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ 
+ module_init(intel_qrk_smep_test_init);
+ module_exit(intel_qrk_smep_test_exit);
+diff --git a/drivers/platform/x86/intel-quark/intel_qrk_thermal.c b/drivers/platform/x86/intel-quark/intel_qrk_thermal.c
+old mode 100644
+new mode 100755
+index 3d9f389..9ca40b4
+--- a/drivers/platform/x86/intel-quark/intel_qrk_thermal.c
++++ b/drivers/platform/x86/intel-quark/intel_qrk_thermal.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013-2015 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -355,4 +355,4 @@ module_platform_driver(intel_qrk_thermal_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@linux.intel.com>");
+ MODULE_DESCRIPTION("Intel Quark Thermal driver");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_board_data.c b/drivers/platform/x86/intel-quark/intel_quark_board_data.c
+old mode 100644
+new mode 100755
+index 1304bf5..60dad56
+--- a/drivers/platform/x86/intel-quark/intel_quark_board_data.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_board_data.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -255,5 +255,5 @@ static int __init intel_qrk_board_data_init(void)
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Intel Quark SPI Data API");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ subsys_initcall(intel_qrk_board_data_init);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
+old mode 100644
+new mode 100755
+index b35f171..8b77d047
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_hill.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -278,5 +278,5 @@ module_platform_driver(qrk_clanton_hill_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Clanton Hill BSP Data");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
+index 703ecc0..cd5316e 100755
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_clanton_peak.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -333,5 +333,5 @@ module_platform_driver(clanton_peak_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Clanton Peak BSP Data");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c b/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
+index af54397..a902e37 100755
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_cross_hill.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -532,5 +532,5 @@ module_platform_driver(qrk_cross_hill_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Cross Hill BSP Data");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+old mode 100644
+new mode 100755
+index 8194138..7ee95e5
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -342,5 +342,5 @@ module_platform_driver(quark_galileo_platform_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Intel Quark SPI Data API");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
+old mode 100644
+new mode 100755
+index 760b99f..bf655e3
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_galileo_gen2.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -350,5 +350,5 @@ module_platform_driver(quark_galileo_platform_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Intel Quark SPI Data API");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c b/drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c
+old mode 100644
+new mode 100755
+index 272e16e..8f89c54
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_kips_bay.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright(c) 2013 Intel Corporation.
++ * Copyright(c) 2013-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -163,5 +163,5 @@ module_platform_driver(qrk_kips_bay_driver);
+ 
+ MODULE_AUTHOR("Bryan O'Donoghue <bryan.odonoghue@intel.com>");
+ MODULE_DESCRIPTION("Kips Bay BSP Data");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+diff --git a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+index 3791fa3..5da96c0 100755
+--- a/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
++++ b/drivers/platform/x86/intel-quark/intel_quark_platform_reliance_creek.c
+@@ -1,7 +1,7 @@
+ /*
+  * Intel Quark board support platform driver
+  *
+- * Copyright(c) 2015 Intel Corporation.
++ * Copyright(c) 2015-2016 Intel Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -423,5 +423,5 @@ module_platform_driver(intel_quark_platform_reliance_creek_driver);
+ 
+ MODULE_AUTHOR("Intel Corporation");
+ MODULE_DESCRIPTION("Reliance Creek BSP Data");
+-MODULE_LICENSE("Dual BSD/GPL");
++MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:"DRIVER_NAME);
+-- 
+1.9.3
+

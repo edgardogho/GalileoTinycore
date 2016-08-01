@@ -1,0 +1,46 @@
+From d27472bc1591dec05900340eac699bc2c23f2e3c Mon Sep 17 00:00:00 2001
+From: Jingoo Han <jg1.han@samsung.com>
+Date: Wed, 12 Feb 2014 11:53:58 +0900
+Subject: [PATCH 091/389] gpio: pl061: Use devm_ioremap_resource()
+
+Use devm_ioremap_resource() in order to make the code simpler.
+
+Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+Reviewed-by: Alexandre Courbot <acourbot@nvidia.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+(cherry picked from commit 09bafc30b6fea0b374ac4ff0b8e923c07f5cda78)
+
+Signed-off-by: Tan, Raymond <raymond.tan@intel.com>
+---
+ drivers/gpio/gpio-pl061.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/gpio/gpio-pl061.c b/drivers/gpio/gpio-pl061.c
+index 062a1be..e528cb2 100644
+--- a/drivers/gpio/gpio-pl061.c
++++ b/drivers/gpio/gpio-pl061.c
+@@ -302,18 +302,9 @@ static int pl061_probe(struct amba_device *adev, const struct amba_id *id)
+ 		irq_base = 0;
+ 	}
+ 
+-	if (!devm_request_mem_region(dev, adev->res.start,
+-				     resource_size(&adev->res), "pl061")) {
+-		dev_err(&adev->dev, "no memory region\n");
+-		return -EBUSY;
+-	}
+-
+-	chip->base = devm_ioremap(dev, adev->res.start,
+-				  resource_size(&adev->res));
+-	if (!chip->base) {
+-		dev_err(&adev->dev, "could not remap memory\n");
+-		return -ENOMEM;
+-	}
++	chip->base = devm_ioremap_resource(dev, &adev->res);
++	if (IS_ERR(chip->base))
++		return PTR_ERR(chip->base);
+ 
+ 	spin_lock_init(&chip->lock);
+ 
+-- 
+1.9.3
+

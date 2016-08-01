@@ -1,0 +1,49 @@
+From 5091696e1d8cd8eafe9a859dff895bd2f124b2d1 Mon Sep 17 00:00:00 2001
+From: Giuseppe CAVALLARO <peppe.cavallaro@st.com>
+Date: Tue, 14 Oct 2014 08:11:54 +0200
+Subject: [PATCH 170/389] stmmac: platform: fix FIXED_PHY support.
+
+On several STi platforms: e.g. stihxxx-b2120 an Ethernet switch is
+embedded and connected to the stmmac via RGMII mode. So this is managed
+by using the FIXED_PHY. In that case, the support in the platform needs
+to be fixed to allow the stmmac to dialog with the switch via fixed-link
+by using phy_bus_name property.
+
+Signed-off-by: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 8c2a7a5d2c6ec6c2a95fe22a6d3af1db07840da8)
+
+Signed-off-by: Dheeraj Jamwal <dheerajx.s.jamwal@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 6521717..4894500 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -160,11 +160,16 @@ static int stmmac_probe_config_dt(struct platform_device *pdev,
+ 	if (of_property_read_u32(np, "snps,phy-addr", &plat->phy_addr) == 0)
+ 		dev_warn(&pdev->dev, "snps,phy-addr property is deprecated\n");
+ 
+-	plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+-					   sizeof(struct stmmac_mdio_bus_data),
+-					   GFP_KERNEL);
+-
+-	plat->force_sf_dma_mode = of_property_read_bool(np, "snps,force_sf_dma_mode");
++	if (plat->phy_bus_name)
++		plat->mdio_bus_data = NULL;
++	else
++		plat->mdio_bus_data =
++			devm_kzalloc(&pdev->dev,
++				     sizeof(struct stmmac_mdio_bus_data),
++				     GFP_KERNEL);
++
++	plat->force_sf_dma_mode =
++		of_property_read_bool(np, "snps,force_sf_dma_mode");
+ 
+ 	/* Set the maxmtu to a default of JUMBO_LEN in case the
+ 	 * parameter is not present in the device tree.
+-- 
+1.9.3
+
