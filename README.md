@@ -34,19 +34,21 @@ Tinycore generates a set of kernel-extensions so the kernel modules are not all 
 Once the kernel is compiled and the kernel modules are placed into the initramfs, you need to copy the files into the microSD card as listed below.
 
 The FAT32 partition (mmcblk0p1) will have:
-|
-|- grub.efi
-|- boot/
-    |- grub/
-        |- grub.conf 
+
+    |
+    |- grub.efi
+    |- boot/
+        |- grub/
+            |- grub.conf 
 
 The EXT3 partition (mmcblk0p2) will have:
-|
-|- bzImage
-|- core.gz
-|- tce/
-    |- onboot.lst
-    |- optional/
+
+    |
+    |- bzImage
+    |- core.gz
+    |- tce/
+        |- onboot.lst
+        |- optional/
 
 After the first boot, tinycore will create /home/tc on mmcblk0p2 to hold tc user home.
 Any TCZ installed using tce-load -wi XXXXXXX.tcz will end up in tce/optional so it will persist after a reboot.
