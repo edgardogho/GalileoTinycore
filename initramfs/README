@@ -1,0 +1,30 @@
+These are the files modified from tinycore initramfs (core.gz)
+
+Download Tinycore 7.x initramfs from:
+http://www.tinycorelinux.net/7.x/x86/release/distribution_files/core.gz
+
+####You can modify the initramfs by creating a temp folder and doing:
+##   Copy core.gz to /tmp
+cp /path/to/core.gz /tmp/core.gz
+cd /tmp
+
+##   Become root and deploy the CPIO file so it can be modified
+sudo su
+mkdir work
+gunzip core.gz
+cd work
+cpio -idmuv < ../core
+
+##   At this point, all the initramfs is deployed on /tmp/work
+##   Modify the files listed in here
+##   Remove tinycore built-in kernel modules located on /tmp/work/lib/modules/*
+##   Install all kernel modules running (after make bzImage, make modules)
+make INSTALL_MOD_PATH=/tmp/work modules_install
+
+##   Kernel modules should be on /tmp/work/lib/modules/KERNEL_VERSION-ltsi-tinycore+
+##   After making all desired modification, generate the compress CPIO file again
+cd /tmp/work
+find . | cpio -oH newc | gzip -2 > ../core.gz
+
+##  The initramfs can be copied to the microSD card now
+

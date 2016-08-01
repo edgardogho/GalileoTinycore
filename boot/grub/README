@@ -1,0 +1,14 @@
+This grub config file will work on microSD cards with one partition (FAT32) for efi (containing the grub.efi binary) and a second partition (ext3) with the rest of the files:
+-bzImage --> Linux Kernel
+-core.gz --> InitramFS CPIO file (kernel modules built-in)
+-/home/tc --> home for tc user (created on first boot)
+-/tce/onboot.lst --> list of TCZs to load during boot
+-/tce/optional/ --> place to put the onboot TCZs
+
+Console is set to ttyS1 (TTL Serial Port on Galileo Gen2) 115200 8n1.
+
+No swap or compressed swap.
+
+Home is on second partition of the microSD card.
+
+Quiet so the kernel dmesgs do not appear on the serial port.
