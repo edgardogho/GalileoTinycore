@@ -21,6 +21,19 @@ cpio -idmuv < ../core
 ##   Install all kernel modules running (after make bzImage, make modules)
 make INSTALL_MOD_PATH=/tmp/work modules_install
 
+##   In order to work with tinycore, galileo needs to output a console on ttyS1 (serial port #1).
+##   Make sure you modify tinycore Initramfs with the files on /etc (inittab) so that serialport 1
+##   puts a terminal
+
+##   As an extra, we can force g_serial to load, and create a virtual serial port using the USB device interface
+##   This way, we can access the Galileo Board using just a USB cable (no need to USB-Serial Interface).
+##   In order to use this, copy the bootlocal.sh script from /opt to the initramfs. It will load the required modules.
+##   This is very convenient. Just use a USB cable on the device interface, connect to a computer and turn on the Galileo.
+##   Hotplug might not work. The terminal will prompt for login when connected.
+##   If you want to use this virtual serial port as a regular serial port (no linux terminal on it), just comment the line
+##   of bootlocal.sh that inits the terminal (leave the module load part), and you can use it as a regular serial port on
+##   /dev/ttyGS0
+
 ##   Kernel modules should be on /tmp/work/lib/modules/KERNEL_VERSION-ltsi-tinycore+
 ##   After making all desired modification, generate the compress CPIO file again
 cd /tmp/work
