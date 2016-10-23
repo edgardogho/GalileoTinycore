@@ -1,0 +1,23 @@
+Some older Galileo boards won't boot from SD.
+In order to fix it, you need to update the firmware stored on the SPI 64Mbit Memory.
+The latest firmware can be downloaded from here:
+http://downloadmirror.intel.com/24355/eng/Flash-missingPDAT_Release-1.0.4.bin
+
+Be aware that this firmware is not ready to be flashed using SPI. It will work but some markers needed to identify the board (Board Type and Mac Address) are not present in this file.
+In order to fix this, Intel provides some tools on its BSP. In particular, you need to use platform-data (part of spi-flash-tools-1.2.1.1).
+First copy the sample-platform-data-ini into yourfile.ini. Edit this file to match you board (Gen1, Gen2, MacAddress).
+Then run: python platform-data-patch.py -p yourfile.ini -i Flash-missingPDAT_Release-1.0.4
+That will patch the Flash Image with your platform data. It will create  a new file named Flash+PlatformData.bin
+
+There are a few different ways to flash this, but I use BusPirate v3.6 (https://www.seeedstudio.com/bus-pirate-v3-assembled-p-609.html?cPath=61_68 ) and Flashrom.
+The pinout of the connector is:
+   3v3  O O  Gnd
+    CS  O O  Clk
+  Miso  O O  Mosi
+          O  NC
+
+The BusPirate will supply power to the SPI chip, so DO NOT connect the galileo power supply while updating the SPI flash.
+With flashrom simply run:
+flashrom --programmer buspirate_spi:dev=/dev/ttyUSB0 -f -n --write Flash+PlatformData.bin
+
+It will take a long time (about an hour ... a little less if using -n). 
