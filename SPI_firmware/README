@@ -21,3 +21,5 @@ With flashrom simply run:
 flashrom --programmer buspirate_spi:dev=/dev/ttyUSB0 -f -n --write Flash+PlatformData.bin
 
 It will take a long time (about an hour ... a little less if using -n). 
+
+If you have a PICKit 2 programmer, it can also be used to program the SPI Flash. Make sure you get the latest flashrom (you might need to compile it).
