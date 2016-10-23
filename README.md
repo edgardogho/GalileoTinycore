@@ -59,6 +59,8 @@ Simply insert the microSD card on the Galileo Board microSD slot. Connect to the
 
 You can use the ethernet port (DHCP) to install TCZs simply doing tce-load -wi XXXXXXX.tcz
 
+## Using USB device port
+You can now connect a USB cable on the client port, and avoid using a USB-Serial interface. The board will output a terminal using g_serial on the USB port. The driver for Windows can be downloaded from Intel site. Mac requires no driver.
 
 ## Thanks
 
