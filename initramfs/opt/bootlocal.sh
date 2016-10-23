@@ -1,8 +1,8 @@
 #!/bin/sh
 # put other system startup commands here
-
-#Load module for g_serial (virtual serial port over USB)
 sudo modprobe pch_udc
-sudo modprobe g_serial use_acm=1
-#Now force a terminal on the virtual serial port
-(sleep 5; sudo su root -c "/sbin/getty 115200 /dev/ttyGS0") &
+sudo modprobe g_serial use_acm=1 idVendor=0x8086 idProduct=0xbabe iProduct="Galileo Board" iManufacturer="Intel"
+
+#leave a terminal hooked to ttyGS0
+(sleep 3; while true; do sudo su root -c "/sbin/getty 115200 /dev/ttyGS0"; sleep 1; done ) &
+
